@@ -1,4 +1,4 @@
-package movida;
+package movida.bassolidong;
 
 /**
  * HashIndirizzamentoAperto

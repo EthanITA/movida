@@ -1,4 +1,4 @@
-package movida;
+package movida.bassolidong;
 
 public class AVL {
 }
