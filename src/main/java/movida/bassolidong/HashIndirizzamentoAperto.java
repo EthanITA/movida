@@ -15,15 +15,10 @@ public class HashIndirizzamentoAperto {
 
     class HashTable {
         String key;
-        List<Movie> data;
-
-        HashTable() {
-            data = new ArrayList<>();
-        }
+        Movie data;
 
         @Override
         public String toString() {
-            // TODO Auto-generated method stub
             return "key: " + key + "\t" + "movies: " + data;
         }
     }
@@ -40,6 +35,16 @@ public class HashIndirizzamentoAperto {
             record[i] = new HashTable();
         }
 
+    }
+
+    public HashTable[] getHashTable() {
+        return record;
+    }
+
+    public void makeEmpty() {
+        for (int i = 0; i < m; i++) {
+            record[i] = new HashTable();
+        }
     }
 
     /**
@@ -66,7 +71,7 @@ public class HashIndirizzamentoAperto {
 
     private void add(String key, Movie data, int i) {
         record[i].key = key;
-        record[i].data.add(data);
+        record[i].data = data;
     }
 
     private boolean find(int index, String key) {
@@ -105,9 +110,9 @@ public class HashIndirizzamentoAperto {
      * @param key chiave per cercare
      * @return lista di movie, se non è presente ritorna lista vuota
      */
-    public List<Movie> get(String key) {
+    public Movie get(String key) {
         int index = indexOf(key);
-        return index != -1 ? record[index].data : new ArrayList<>();
+        return index != -1 ? record[index].data : null;
     }
 
     /**

@@ -1,14 +1,20 @@
 package movida.bassolidong;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import movida.bassolidong.HashIndirizzamentoAperto.HashTable;
 import movida.bassolidong.custom_exceptions.ArrayOutOfSizeException;
 import movida.commons.Collaboration;
 import movida.commons.IMovidaCollaborations;
@@ -31,7 +37,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     // BubbleSort e MergeSort
     private SortingAlgorithm algorithm;
     // AVL e HashIndirizzamentoAperto
-    private MapImplementation dataStructure;
+    private MapImplementation dataStructure = MapImplementation.HashIndirizzamentoAperto;
 
     private AVLTree avl;
     private HashIndirizzamentoAperto hash;
@@ -55,13 +61,12 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         MovidaCore mc = new MovidaCore(10);
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
+        mc.saveToFile(
+                new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/saveToFile_prova.txt"));
 
     }
 
     /* funzioni ausiliarie */
-    private void print(Object x) {
-        System.out.println(x);
-    }
 
     /**
      * Controlla se l'algoritmo di sorting è assegnato al nostro gruppo
@@ -107,7 +112,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      * @param votes
      * @return per ogni param controlla se il suo rispettivo regex matcha
      */
-    private boolean validMovidaFile(String title, String year, String director, String cast, String votes) {
+    private boolean validMovidaMovie(String title, String year, String director, String cast, String votes) {
         // I SPAZI DIETRO I NUMERI, I DOPPI SPAZI E I TAB SONO UNA COSA TROPPO
         // PERVERSA!!!!!
         class movidaRegex {
@@ -143,6 +148,8 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
                 }
             }
         }
+        result.add(new Person(person_name));
+        System.out.println(result);
         return result;
     }
 
@@ -168,13 +175,31 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         return dataStructure == MapImplementation.AVL;
     }
 
+    public String personsToMovidaCast(Person[] p) {
+        StringBuilder result = new StringBuilder(p[0].getName());
+        for (int i = 1; i < p.length; i++) {
+            result.append(", " + p[i].getName());
+        }
+        return result.toString();
+    }
+
+    private void writeMovieToFile(BufferedWriter bw, Movie m) throws IOException {
+        bw.write("Title: " + m.getTitle());
+        bw.newLine();
+        bw.write("Year: " + m.getYear());
+        bw.newLine();
+        bw.write("Director: " + m.getDirector().getName());
+        bw.newLine();
+        bw.write("Cast: " + personsToMovidaCast(m.getCast()));
+        bw.newLine();
+        bw.write("Votes: " + m.getVotes());
+    }
     /////////////////////////////////////////////////////
 
     /* INIZIO IMovidaDB */
 
     @Override
     public void loadFromFile(File f) {
-        // TODO Auto-generated method stub
 
         try {
             FileReader fr = new FileReader(f); // read file
@@ -187,7 +212,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
                     line = br.readLine();
                     movie[i] = line;
                 }
-                if (!validMovidaFile(movie[0], movie[1], movie[2], movie[3], movie[4])) {
+                if (!validMovidaMovie(movie[0], movie[1], movie[2], movie[3], movie[4])) {
                     throw new MovidaFileException();
                 } else {
                     Movie m = stringToMovie(movie);
@@ -200,14 +225,29 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
             fr.close();
 
         } catch (IOException | ArrayOutOfSizeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     @Override
     public void saveToFile(File f) {
-        // TODO Auto-generated method stub
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(f);
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+
+            Movie[] m = getAllMovies();
+            writeMovieToFile(bw, m[0]);
+            for (int i = 1; i < m.length; i++) {
+                bw.newLine();
+                bw.newLine();
+                writeMovieToFile(bw, m[i]);
+            }
+
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -249,8 +289,17 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     @Override
     public Movie[] getAllMovies() {
-        // TODO Auto-generated method stub
-        return null;
+        Movie[] m;
+        if (isAVL()) {
+            m = null;
+        } else {
+            HashTable[] h = hash.getHashTable();
+            m = new Movie[h.length];
+            for (int i = 0; i < m.length; i++) {
+                m[i] = h[i].data;
+            }
+        }
+        return m;
     }
 
     @Override
