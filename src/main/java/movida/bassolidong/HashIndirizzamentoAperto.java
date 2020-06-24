@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import movida.bassolidong.custom_exception.ArrayOutOfSizeException;
+import movida.bassolidong.custom_exceptions.ArrayOutOfSizeException;
 import movida.commons.Movie;
 import movida.commons.Person;
 
@@ -91,11 +91,12 @@ public class HashIndirizzamentoAperto {
         }
     }
 
-    public void delete(String key) {
+    public boolean delete(String key) {
         int index = indexOf(key);
         if (index != -1) {
             record[index] = new HashTable();
         }
+        return index != -1;
     }
 
     /**
@@ -120,7 +121,7 @@ public class HashIndirizzamentoAperto {
     public void insert(String key, Movie data) throws ArrayOutOfSizeException {
         int index = indexOf(key);
         if (index == -1) {
-            throw new ArrayOutOfSizeException("\n\t" + "Spazio esaurito!");
+            throw new ArrayOutOfSizeException("\n\t" + "Spazio esaurito: " + m + "!!");
         } else {
             add(key, data, index);
         }
