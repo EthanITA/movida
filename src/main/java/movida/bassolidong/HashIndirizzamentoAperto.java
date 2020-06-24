@@ -1,4 +1,6 @@
 package movida.bassolidong;
+<<<<<<< HEAD
+=======
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +8,7 @@ import java.util.List;
 import movida.bassolidong.custom_exception.ArrayOutOfSizeException;
 import movida.commons.Movie;
 import movida.commons.Person;
+>>>>>>> fbe8ef65360768d21a4fe3a020b2bd1fbba090d6
 
 public class HashIndirizzamentoAperto {
 

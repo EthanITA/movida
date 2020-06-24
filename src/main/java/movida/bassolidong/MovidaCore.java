@@ -30,7 +30,17 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      * @param args The arguments of the program.
      */
     public static void main(String[] args) {
+<<<<<<< HEAD
+        MovidaCore mc = new MovidaCore();
+        /*mc.print(mc.setSort(SortingAlgorithm.InsertionSort));
+        mc.print(mc.setSort(SortingAlgorithm.BubbleSort));
+        mc.print(mc.setSort(SortingAlgorithm.BubbleSort));
+        mc.print(mc.setSort(SortingAlgorithm.MergeSort));
+        mc.print(mc.setSort(SortingAlgorithm.SelectionSort));*/
+        System.out.println("aa".compareTo("bb"));
+=======
         System.out.println('a' + 'b' + 'c' < 'a' + 'b' + 'd');
+>>>>>>> fbe8ef65360768d21a4fe3a020b2bd1fbba090d6
     }
 
     /* funzioni ausiliarie */
