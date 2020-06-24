@@ -1,7 +1,6 @@
 package movida.bassolidong;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import movida.bassolidong.custom_exception.ArrayOutOfSizeException;
