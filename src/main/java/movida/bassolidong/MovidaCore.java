@@ -149,7 +149,6 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
             }
         }
         result.add(new Person(person_name));
-        System.out.println(result);
         return result;
     }
 
