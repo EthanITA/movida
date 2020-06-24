@@ -1,5 +1,8 @@
 package movida.bassolidong;
 import java.io.*;
+
+import movida.commons.Movie;
+import movida.commons.Person;
 public class AvlTest {
 
 	public static void main(String[] args) throws Exception {
@@ -7,7 +10,11 @@ public class AvlTest {
 		InputStreamReader input = new InputStreamReader(System.in);
 		BufferedReader tastiera = new BufferedReader(input);
         /* Creating object of AVLTree */
-        AVLTree_Title avlt = new AVLTree_Title();
+        AVLTree avlt = new AVLTree();
+        Person [] cast= {new Person("Lorenzo")};
+        
+        Movie m=new Movie("Inception",2010,20,cast,new Person("Lorenzo"));
+        
         char ch;
         
         do {
@@ -20,37 +27,12 @@ public class AvlTest {
         switch (choice)
         {
         case 1 : 
-        	String Title ,Year, Director, votes;
-        	int numcast;
         	
-            System.out.println("Inserisci titolo film ");
-            Title=tastiera.readLine();
-            
-            System.out.println("Inserisci anno film");
-            Year=tastiera.readLine();
-            
-            System.out.println("Inserisci chi ha diretto il film ");
-            Director=tastiera.readLine();
-            
-            System.out.println("Inserisci numero di persone che compongono il cast");
-            numcast= Integer.parseInt(tastiera.readLine()); 
-            
-            int dimcast=20;
-            String [] cast= new String[dimcast];
-            
-            for(int i=0;i<numcast; i++) {
-            System.out.println("Inserisci un attore del cast");
-            cast[i]=tastiera.readLine();
-            }  
-            
-            System.out.println("Inserisci votazioni del film ");
-            votes=tastiera.readLine();
-            
-            avlt.insert(Title, Year, Director, numcast, cast, votes);
+            avlt.insert(m);
             break;  
             
         case 2 : 
-        	
+        	String Title;
             System.out.println("Inserisci Film da cercare");
             Title=tastiera.readLine();
             if( avlt.search(Title)) {
