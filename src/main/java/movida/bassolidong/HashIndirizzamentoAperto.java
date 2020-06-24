@@ -1,27 +1,30 @@
 package movida.bassolidong;
-<<<<<<< HEAD
-=======
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import movida.bassolidong.custom_exception.ArrayOutOfSizeException;
 import movida.commons.Movie;
 import movida.commons.Person;
->>>>>>> fbe8ef65360768d21a4fe3a020b2bd1fbba090d6
 
 public class HashIndirizzamentoAperto {
 
-    int m;
-    int count = 0;
-    Hash[] record;
+    private int m;
+    private HashTable[] record;
 
-    class Hash {
+    class HashTable {
         String key;
         List<Movie> data;
 
-        Hash() {
+        HashTable() {
             data = new ArrayList<>();
+        }
+
+        @Override
+        public String toString() {
+            // TODO Auto-generated method stub
+            return "key: " + key + "\t" + "movies: " + data;
         }
     }
 
@@ -32,9 +35,9 @@ public class HashIndirizzamentoAperto {
      */
     public HashIndirizzamentoAperto(int size) {
         this.m = size;
-        record = new Hash[size];
+        record = new HashTable[size];
         for (int i = 0; i < size; i++) {
-            record[i] = new Hash();
+            record[i] = new HashTable();
         }
 
     }
@@ -45,7 +48,7 @@ public class HashIndirizzamentoAperto {
      * @param k chiave
      * @return indice compreso tra 0 a m-1
      */
-    private int hash(String k) {
+    protected int fHash(String k) {
         return (k.hashCode() & 0xfffffff) % this.m;
     }
 
@@ -56,14 +59,54 @@ public class HashIndirizzamentoAperto {
      * @param i passo i-esimo della mia iterazione
      * @return nuovo indice
      */
-    private int scansione(String k, int i) {
+    protected int fScansione(String k, int i) {
 
-        return (hash(k) + i) % m;
+        return (fHash(k) + i) % m;
     }
 
     private void add(String key, Movie data, int i) {
         record[i].key = key;
         record[i].data.add(data);
+    }
+
+    private boolean find(int index, String key) {
+        return record[index].key == null || record[index].key.equals(key);
+    }
+
+    protected int indexOf(String key) {
+        int index = fHash(key);
+        if (find(index, key)) {
+            return index;
+        } else {
+            int i = 0;
+            index = fScansione(key, i);
+            while (!find(index, key)) {
+                i += 1;
+                index = fScansione(key, i);
+                if (i >= m) {
+                    return -1;
+                }
+            }
+            return index;
+        }
+    }
+
+    public void delete(String key) {
+        int index = indexOf(key);
+        if (index != -1) {
+            record[index] = new HashTable();
+        }
+    }
+
+    /**
+     * Cerca la lista di Movie
+     * 
+     * @param key chiave per cercare
+     * @return lista di movie, se non è presente ritorna lista vuota
+     */
+    public List<Movie> get(String key) {
+        int index = indexOf(key);
+        return index != -1 ? record[index].data : new ArrayList<>();
     }
 
     /**
@@ -75,21 +118,10 @@ public class HashIndirizzamentoAperto {
      * @throws ArrayOutOfSizeException lancia un'eccezione se lo spazio è esaurito
      */
     public void insert(String key, Movie data) throws ArrayOutOfSizeException {
-        int index = hash(key);
-        if (record[index].key == null || record[index].key.equals(key)) {
-            add(key, data, index);
+        int index = indexOf(key);
+        if (index == -1) {
+            throw new ArrayOutOfSizeException("\n\t" + "Spazio esaurito!");
         } else {
-            int i = 0;
-            index = scansione(key, i);
-            while (!(record[index].key == null || record[index].key.equals(key))) {
-                i += 1;
-                index = scansione(key, i);
-                if (i >= m) {
-
-                    throw new ArrayOutOfSizeException("\n\t" + "Spazio esaurito!");
-
-                }
-            }
             add(key, data, index);
         }
     }
@@ -115,13 +147,17 @@ public class HashIndirizzamentoAperto {
 
         h.insert("titolo2", new Movie("titolo", 1999, 13232, p, p1));
         h.insert("titolo2", new Movie("titolo", 1999, 13232, p, p1));
-        h.insert("titolo11112", new Movie("titolo", 1999, 13232, p, p1));
         h.insert("titolo12", new Movie("titolo", 1999, 13232, p, p1));
 
-        for (int i = 0; i < 10; i++) {
-            System.out.print(h.record[i].key + "\t");
-            System.out.println(h.record[i].data);
-        }
+        System.out.println(h.get("titolo2"));
+        h.delete("titolo2");
+        System.out.println(h.get("titolo2"));
+
+    }
+
+    @Override
+    public String toString() {
+        return "HashIndirizzamentoAperto [m=" + m + ", record=" + Arrays.toString(record) + "]";
     }
 
 }
