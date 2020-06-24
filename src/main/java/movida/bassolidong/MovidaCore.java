@@ -33,16 +33,16 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     // AVL e HashIndirizzamentoAperto
     private MapImplementation dataStructure;
 
-    private AVLTree_Title avl;
+    private AVLTree avl;
     private HashIndirizzamentoAperto hash;
 
     public MovidaCore(int avl_size, int hash_size) {
-        avl = new AVLTree_Title();
+        avl = new AVLTree();
         hash = new HashIndirizzamentoAperto(hash_size);
     }
 
     public MovidaCore(int size) {
-        avl = new AVLTree_Title();
+        avl = new AVLTree();
         hash = new HashIndirizzamentoAperto(size);
     }
 
