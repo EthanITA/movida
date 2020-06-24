@@ -55,7 +55,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         MovidaCore mc = new MovidaCore(10);
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
-        System.out.println(mc.getMovieByTitle("Cape Fear"));
+
     }
 
     /* funzioni ausiliarie */
@@ -111,9 +111,9 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         // I SPAZI DIETRO I NUMERI, I DOPPI SPAZI E I TAB SONO UNA COSA TROPPO
         // PERVERSA!!!!!
         class movidaRegex {
-            String title = "Title:\\s+([A-Z]+[a-z]*(\s)*)+(\s)*", year = "Year:\\s+[0-9]+(\s)*",
-                    director = "Director:\\s+([A-Z]+[a-z]*(\s)*)+(\s)*",
-                    cast = "Cast:\\s+(([A-Z]+[a-z]*(\s)*)+(,\s)*)+(\s)*", votes = "Votes:\\s+[0-9]+(\s)*";
+            String title = "Title:\\s+([A-Z0-9]+[a-z0-9]*(\\s)*)+(\\s)*", year = "Year:\\s+[0-9]+(\\s)*",
+                    director = "Director:\\s+([A-Z]+[a-z]*(\\s)*)+(\\s)*",
+                    cast = "Cast:\\s+(([A-Z]+[a-z]*(\\s)*)+(,\\s)*)+(\\s)*", votes = "Votes:\\s+[0-9]+(\\s)*";
         }
         movidaRegex reg = new movidaRegex();
         /*
