@@ -35,7 +35,7 @@ public class AvlTest {
         	String Title;
             System.out.println("Inserisci Film da cercare");
             Title=tastiera.readLine();
-            if( avlt.search(Title)) {
+            if( avlt.searchNode(Title)) {
             	System.out.println("Il titolo è presente");
             }
             else {

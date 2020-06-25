@@ -59,16 +59,21 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      */
     public static void main(String[] args) {
         MovidaCore mc = new MovidaCore(10);
-        mc.loadFromFile(
-                new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
-        System.out.println(mc.getAllPeople().length);
-        for (Integer i : mc.getActorsOccurence(mc.getAllPeople())) {
+        /*
+         * mc.loadFromFile( new File(
+         * "/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"
+         * )); System.out.println(mc.getAllPeople().length); for (Integer i :
+         * mc.getActorsOccurence(mc.getAllPeople())) {
+         * 
+         * System.out.print(i + " "); } System.out.println(mc.getAllPeople());
+         * mc.clear(); System.out.println(mc.getAllMovies().length);
+         * System.out.println(mc.countMovies());
+         */
+        mc.loadFromFile(new File(
+                "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
 
-            System.out.print(i + " ");
-        }
-        System.out.println(mc.getAllPeople());
-        mc.clear();
-        System.out.println(mc.getAllMovies().length);
+        /* mc.countMovies(); */
+        System.out.println(mc.countPeople());
 
     }
 
@@ -461,7 +466,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     @Override
     public int countMovies() {
         if (isAVL()) {
-            return avl.size();
+            return avl.countNodes();
         } else {
             return hash.countMovies();
         }
