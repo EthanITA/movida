@@ -72,7 +72,9 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
          "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
 
         /* mc.countMovies(); */
-        System.out.println(mc.countMovies());
+        System.out.println(mc.countPeople());
+        mc.clear();
+        System.out.println(mc.countPeople());
 
     }
 

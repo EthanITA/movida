@@ -336,7 +336,6 @@ public class AVLTree extends AVLNode {
 	}
 
 	public void countPeople(AVLNode r) {
-		System.out.println(r);
 		if (r != null) {
 			AggiungiAllaLista(r);
 			countPeople(r.left);
