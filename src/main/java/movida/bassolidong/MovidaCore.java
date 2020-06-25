@@ -13,7 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import movida.bassolidong.HashIndirizzamentoAperto.HashTable;
-import movida.bassolidong.custom_exceptions.ArrayOutOfSizeException;
+import movida.bassolidong.custom_classes.ArrayOutOfSizeException;
+import movida.bassolidong.custom_classes.LambdaExpressions;
 import movida.commons.Collaboration;
 import movida.commons.IMovidaCollaborations;
 import movida.commons.IMovidaConfig;
@@ -38,6 +39,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     private MapImplementation dataStructure = MapImplementation.HashIndirizzamentoAperto;
 
     private AVLTree avl;
+    // hash ha come chiavi Title
     private HashIndirizzamentoAperto hash;
 
     public MovidaCore(int avl_size, int hash_size) {
@@ -59,8 +61,11 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         MovidaCore mc = new MovidaCore(10);
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
+        for (Movie m : mc.searchMoviesByTitle("a")) {
+            System.out.println(m.getTitle());
+        }
         mc.saveToFile(
-                new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/saveToFile_prova.txt"));
+                new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/bassolidong/saveToFile_prova.txt"));
 
     }
 
@@ -168,6 +173,29 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         return dataStructure == MapImplementation.AVL;
     }
 
+    private boolean isBubbleSort() {
+        return algorithm == SortingAlgorithm.BubbleSort;
+    }
+
+    private Integer[] sort(Integer[] array) {
+        // TODO restituire gli indici invece degli elementi!!
+        Integer[] result = new Integer[array.length];
+        if (isBubbleSort()) {
+
+        } else {
+
+        }
+        return result;
+    }
+
+    private Movie[] first(Integer n, Movie[] array) {
+        Movie[] result = new Movie[n];
+        for (int i = 0; i < n; i++) {
+            result[i] = array[i];
+        }
+        return result;
+    }
+
     public String personsToMovidaCast(Person[] p) {
         StringBuilder result = new StringBuilder(p[0].getName());
         for (int i = 1; i < p.length; i++) {
@@ -186,6 +214,36 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         bw.write("Cast: " + personsToMovidaCast(m.getCast()));
         bw.newLine();
         bw.write("Votes: " + m.getVotes());
+    }
+
+    private Movie[] listOfMoviesToArray(List<Movie> l) {
+        Movie[] result = new Movie[l.size()];
+        return l.toArray(result);
+
+    }
+
+    private Integer[] listOfIntegerToArray(List<Integer> l) {
+        Integer[] result = new Integer[l.size()];
+        return l.toArray(result);
+    }
+
+    private boolean elemInArray(Object elem, Object[] array) {
+        for (Object object : array) {
+            if (object.equals(elem)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Movie[] sortMoviesWithIndexes(Integer[] indexes) {
+        Movie[] allM = getAllMovies();
+        Movie[] result = new Movie[indexes.length];
+        // se getAllMovies è null non è un problema perchè indexes avrà length 0
+        for (int i = 0; i < indexes.length; i++) {
+            result[i] = allM[indexes[i]];
+        }
+        return result;
     }
     /////////////////////////////////////////////////////
 
@@ -290,7 +348,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
             HashTable[] h = hash.getHashTable();
             m = new Movie[h.length];
             for (int i = 0; i < m.length; i++) {
-                m[i] = h[i].data;
+                m[i] = h[i].data.get(0);
             }
         }
         return m;
@@ -329,40 +387,54 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     ///////////////////////////////////////////////////////////////////
 
     /* INIZIO IMovidaSearch */
+
+    public Movie[] searchMovies(LambdaExpressions.MovieSearchElem condition) {
+        List<Movie> result = new ArrayList<>();
+        for (Movie m : getAllMovies()) {
+            if (condition.searchIn(m)) {
+                result.add(m);
+            }
+        }
+        return listOfMoviesToArray(result);
+    }
+
     @Override
     public Movie[] searchMoviesByTitle(String title) {
-        // TODO Auto-generated method stub
-        return null;
+
+        return searchMovies(m -> m.getTitle().contains(title));
     }
 
     @Override
     public Movie[] searchMoviesInYear(Integer year) {
-        // TODO Auto-generated method stub
-        return null;
+        return searchMovies(m -> m.getYear().equals(year));
     }
 
     @Override
     public Movie[] searchMoviesDirectedBy(String name) {
-        // TODO Auto-generated method stub
-        return null;
+        return searchMovies(m -> m.getDirector().getName().equals(name));
     }
 
     @Override
     public Movie[] searchMoviesStarredBy(String name) {
-        // TODO Auto-generated method stub
-        return null;
+        return searchMovies(m -> elemInArray(name, m.getCast()));
+    }
+
+    public Integer[] getFieldsAsArray(LambdaExpressions.MovieGetIntegerField condition) {
+        List<Integer> result = new ArrayList<>();
+        for (Movie m : getAllMovies()) {
+            result.add(condition.getField(m));
+        }
+        return listOfIntegerToArray(result);
     }
 
     @Override
     public Movie[] searchMostVotedMovies(Integer N) {
-        // TODO Auto-generated method stub
-        return null;
+        return first(N, sortMoviesWithIndexes(sort(getFieldsAsArray(m -> m.getVotes()))));
     }
 
     @Override
     public Movie[] searchMostRecentMovies(Integer N) {
-        // TODO Auto-generated method stub
-        return null;
+        return first(N, sortMoviesWithIndexes(sort(getFieldsAsArray(m -> m.getYear()))));
     }
 
     @Override

@@ -10,8 +10,6 @@ package movida.commons;
 
 import java.io.File;
 
-import movida.bassolidong.custom_exceptions.ArrayOutOfSizeException;
-
 /**
  * 
  * Interfaccia usata per descrivere le operazioni di caricamento dei dati
@@ -37,11 +35,10 @@ public interface IMovidaDB {
 	 * sollevata un'eccezione.
 	 * 
 	 * @param f il file da cui caricare i dati
-	 * @throws ArrayOutOfSizeException
 	 * 
-	 * @throws MovidaFileException     in caso di errore di caricamento
+	 * @throws MovidaFileException in caso di errore di caricamento
 	 */
-	public void loadFromFile(File f) throws ArrayOutOfSizeException;
+	public void loadFromFile(File f);
 
 	/**
 	 * Salva tutti i dati su un file.

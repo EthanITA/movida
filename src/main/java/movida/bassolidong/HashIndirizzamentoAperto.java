@@ -1,8 +1,10 @@
 package movida.bassolidong;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import movida.bassolidong.custom_exceptions.ArrayOutOfSizeException;
+import movida.bassolidong.custom_classes.ArrayOutOfSizeException;
 import movida.commons.Movie;
 import movida.commons.Person;
 
@@ -13,7 +15,11 @@ public class HashIndirizzamentoAperto {
 
     class HashTable {
         String key;
-        Movie data;
+        List<Movie> data;
+
+        HashTable() {
+            data = new ArrayList<>();
+        }
 
         @Override
         public String toString() {
@@ -69,7 +75,7 @@ public class HashIndirizzamentoAperto {
 
     private void add(String key, Movie data, int i) {
         record[i].key = key;
-        record[i].data = data;
+        record[i].data.add(data);
     }
 
     private boolean find(int index, String key) {
@@ -108,9 +114,9 @@ public class HashIndirizzamentoAperto {
      * @param key chiave per cercare
      * @return lista di movie, se non è presente ritorna lista vuota
      */
-    public Movie get(String key) {
+    public List<Movie> get(String key) {
         int index = indexOf(key);
-        return index != -1 ? record[index].data : null;
+        return index != -1 ? record[index].data : new ArrayList<>();
     }
 
     /**
