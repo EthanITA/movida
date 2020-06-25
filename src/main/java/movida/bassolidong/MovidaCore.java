@@ -113,18 +113,14 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     private boolean validMovidaMovie(String title, String year, String director, String cast, String votes) {
         // I SPAZI DIETRO I NUMERI, I DOPPI SPAZI E I TAB SONO UNA COSA TROPPO
         // PERVERSA!!!!!
-        class movidaRegex {
-            String title = "Title:\\s+([A-Z0-9]+[a-z0-9]*(\\s)*)+(\\s)*", year = "Year:\\s+[0-9]+(\\s)*",
-                    director = "Director:\\s+([A-Z]+[a-z]*(\\s)*)+(\\s)*",
-                    cast = "Cast:\\s+(([A-Z]+[a-z]*(\\s)*)+(,\\s)*)+(\\s)*", votes = "Votes:\\s+[0-9]+(\\s)*";
+        class MovidaRegex {
+            String title = "Title:\\s+([A-Z0-9]+[a-z0-9]*(\\s)*)+(\\s)*";
+            String year = "Year:\\s+[0-9]+(\\s)*";
+            String director = "Director:\\s+([A-Z]+[a-z]*(\\s)*)+(\\s)*";
+            String cast = "Cast:\\s+(([A-Z]+[a-z]*(\\s)*)+(,\\s)*)+(\\s)*";
+            String votes = "Votes:\\s+[0-9]+(\\s)*";
         }
-        movidaRegex reg = new movidaRegex();
-        /*
-         * print(regtest(reg.title, title) + "\t" + title); print(regtest(reg.year,
-         * year) + "\t" + year); print(regtest(reg.director, director) + "\t" +
-         * director); print(regtest(reg.cast, cast) + "\t" + cast);
-         * print(regtest(reg.votes, votes) + "\t" + votes);
-         */
+        MovidaRegex reg = new MovidaRegex();
         return regtest(reg.title, title) && regtest(reg.year, year) && regtest(reg.director, director)
                 && regtest(reg.cast, cast) && regtest(reg.votes, votes);
     }
