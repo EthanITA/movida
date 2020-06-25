@@ -60,16 +60,16 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     public static void main(String[] args) {
         MovidaCore mc = new MovidaCore(10);
 
-        mc.loadFromFile(
-                new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
+       /* mc.loadFromFile(
+                new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));*/
         System.out.println(mc.getAllPeople().length);
         for (Person p : mc.getAllPeople()) {
             System.out.println(p);
         }
 
         mc.setMap(MapImplementation.AVL);
-        // mc.loadFromFile(new File(
-        // "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
+         mc.loadFromFile(new File(
+         "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
 
         /* mc.countMovies(); */
         System.out.println(mc.countMovies());
