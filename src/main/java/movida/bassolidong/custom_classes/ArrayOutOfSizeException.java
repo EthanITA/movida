@@ -1,4 +1,4 @@
-package movida.bassolidong.custom_exceptions;
+package movida.bassolidong.custom_classes;
 
 public class ArrayOutOfSizeException extends Exception {
     /**

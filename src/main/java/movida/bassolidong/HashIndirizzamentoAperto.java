@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import movida.bassolidong.custom_exceptions.ArrayOutOfSizeException;
+import movida.bassolidong.custom_classes.ArrayOutOfSizeException;
 import movida.commons.Movie;
 import movida.commons.Person;
 
@@ -23,7 +23,6 @@ public class HashIndirizzamentoAperto {
 
         @Override
         public String toString() {
-            // TODO Auto-generated method stub
             return "key: " + key + "\t" + "movies: " + data;
         }
     }
@@ -40,6 +39,16 @@ public class HashIndirizzamentoAperto {
             record[i] = new HashTable();
         }
 
+    }
+
+    public HashTable[] getHashTable() {
+        return record;
+    }
+
+    public void makeEmpty() {
+        for (int i = 0; i < m; i++) {
+            record[i] = new HashTable();
+        }
     }
 
     /**
