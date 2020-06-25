@@ -28,27 +28,6 @@ public class AVLTree extends AVLNode {
 	public int size() {
 		return countNodes();
 	}
-<<<<<<< HEAD
-	
-	public boolean insert(Movie m)
-    {	if(m == null) return false;
-        if(!search(root,m.getTitle())) {
-        	root=insert(root,m);
-        	return true;
-        }
-        return false;
-    }
-	
-	public AVLNode insert (AVLNode n, Movie m) 
-	{
-		//caso base
-		if(n == null) return new AVLNode(m);
-		
-		int cmp=m.getTitle().compareTo(n.m.getTitle());
-		
-		if(cmp < 0) {
-			n.left= insert(n.left, m);
-=======
 
 	public boolean insert(Movie m) {
 		if (m == null)
@@ -56,7 +35,6 @@ public class AVLTree extends AVLNode {
 		if (!search(root, m.getTitle())) {
 			root = insert(root, m);
 			return true;
->>>>>>> 5e825b7972cb6bad527e5bf12a44b1afa9ec1e31
 		}
 		return false;
 	}
