@@ -59,21 +59,20 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      */
     public static void main(String[] args) {
         MovidaCore mc = new MovidaCore(10);
-        /*
-         * mc.loadFromFile( new File(
-         * "/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"
-         * )); System.out.println(mc.getAllPeople().length); for (Integer i :
-         * mc.getActorsOccurence(mc.getAllPeople())) {
-         * 
-         * System.out.print(i + " "); } System.out.println(mc.getAllPeople());
-         * mc.clear(); System.out.println(mc.getAllMovies().length);
-         * System.out.println(mc.countMovies());
-         */
-        mc.loadFromFile(new File(
-                "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
+
+        mc.loadFromFile(
+                new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
+        System.out.println(mc.getAllPeople().length);
+        for (Person p : mc.getAllPeople()) {
+            System.out.println(p);
+        }
+
+        mc.setMap(MapImplementation.AVL);
+        // mc.loadFromFile(new File(
+        // "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
 
         /* mc.countMovies(); */
-        System.out.println(mc.countPeople());
+        System.out.println(mc.countMovies());
 
     }
 
@@ -421,7 +420,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
                 } else {
                     Movie m = stringToMovie(movie);
                     hash.insert(m.getTitle(), m);
-                    // avl.insert(m);
+                    avl.insert(m);
                 }
                 line = br.readLine();
             }
