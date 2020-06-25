@@ -61,11 +61,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         MovidaCore mc = new MovidaCore(10);
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
-        for (Movie m : mc.searchMoviesByTitle("a")) {
-            System.out.println(m.getTitle());
-        }
-        mc.saveToFile(
-                new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/bassolidong/saveToFile_prova.txt"));
+        System.out.println(mc.countMovies());
 
     }
 
@@ -118,19 +114,12 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     private boolean validMovidaMovie(String title, String year, String director, String cast, String votes) {
         // I SPAZI DIETRO I NUMERI, I DOPPI SPAZI E I TAB SONO UNA COSA TROPPO
         // PERVERSA!!!!!
-<<<<<<< HEAD
-        class movidaRegex {
-            String title = "Title:\\s+([A-Z]+[a-z]*(\\s)*)+(\\s)*", year = "Year:\\s+[0-9]+(\\s)*",
-                    director = "Director:\\s+([A-Z]+[a-z]*(\\s)*)+(\\s)*",
-                    cast = "Cast:\\s+(([A-Z]+[a-z]*(\\s)*)+(,\\s)*)+(\\s)*", votes = "Votes:\\s+[0-9]+(\\s)*";
-=======
         class MovidaRegex {
             String title = "Title:\\s+([A-Z0-9]+[a-z0-9]*(\\s)*)+(\\s)*";
             String year = "Year:\\s+[0-9]+(\\s)*";
             String director = "Director:\\s+([A-Z]+[a-z]*(\\s)*)+(\\s)*";
             String cast = "Cast:\\s+(([A-Z]+[a-z]*(\\s)*)+(,\\s)*)+(\\s)*";
             String votes = "Votes:\\s+[0-9]+(\\s)*";
->>>>>>> 5353a24df54f80dcfcf21dacf3c1b38547f49fed
         }
         MovidaRegex reg = new MovidaRegex();
         return regtest(reg.title, title) && regtest(reg.year, year) && regtest(reg.director, director)
@@ -186,9 +175,9 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     private Integer[] sort(Integer[] array) {
         // TODO restituire gli indici invece degli elementi!!
+
         Integer[] result = new Integer[array.length];
         if (isBubbleSort()) {
-
         } else {
 
         }
@@ -275,7 +264,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
                 } else {
                     Movie m = stringToMovie(movie);
                     hash.insert(m.getTitle(), m);
-                    // avl.insert(m);
+                    avl.insert(m);
                 }
                 line = br.readLine();
             }
@@ -313,34 +302,36 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     @Override
     public void clear() {
         avl.makeEmpty();
-        //marco, da implementare
-        
+        hash.makeEmpty();
+
     }
 
     @Override
     public int countMovies() {
-        /*if(isAVL())*/ { return avl.size();}
-    	//else
+        /* if(isAVL()) */ {
+            return avl.size();
+        }
+        // else
     }
 
     @Override
     public int countPeople() {
-        if(isAVL()) {
-        	return avl.countPeople();
+        if (isAVL()) {
+            return avl.countPeople();
         }
         return 0;
     }
 
     @Override
     public boolean deleteMovieByTitle(String title) {
-        avl.delete_by_title(title); //funzione void che elimina il nodo con il titolo in input
+        avl.delete_by_title(title); // funzione void che elimina il nodo con il titolo in input
         return false;
     }
 
     @Override
     public Movie getMovieByTitle(String title) {
         return avl.search_by_title(title).m;
-       
+
     }
 
     @Override
