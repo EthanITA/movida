@@ -5,7 +5,7 @@ import movida.commons.Movie;
 public class AVLTree extends AVLNode{
 
 	public AVLNode root;
-	public int nodeCount=0;
+	
 	
 	//costruttore
 	public AVLTree() {
@@ -28,7 +28,7 @@ public class AVLTree extends AVLNode{
 	}
 	
 	public int size() {
-		return nodeCount;
+		return countNodes();
 	}
 	
 	public boolean insert(Movie m)
