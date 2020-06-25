@@ -3,13 +3,11 @@ package movida.bassolidong;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -219,12 +217,11 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
                     // avl.insert(m);
                 }
                 line = br.readLine();
-                // System.out.println(movie);
             }
-            fr.close();
 
         } catch (IOException | ArrayOutOfSizeException e) {
             e.printStackTrace();
+
         }
     }
 
@@ -236,13 +233,15 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 
             Movie[] m = getAllMovies();
-            writeMovieToFile(bw, m[0]);
-            for (int i = 1; i < m.length; i++) {
-                bw.newLine();
-                bw.newLine();
-                writeMovieToFile(bw, m[i]);
-            }
+            if (m != null) {
+                writeMovieToFile(bw, m[0]);
+                for (int i = 1; i < m.length; i++) {
+                    bw.newLine();
+                    bw.newLine();
+                    writeMovieToFile(bw, m[i]);
+                }
 
+            }
             bw.close();
         } catch (IOException e) {
             e.printStackTrace();
