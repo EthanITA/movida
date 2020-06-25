@@ -111,9 +111,9 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         // I SPAZI DIETRO I NUMERI, I DOPPI SPAZI E I TAB SONO UNA COSA TROPPO
         // PERVERSA!!!!!
         class movidaRegex {
-            String title = "Title:\\s+([A-Z]+[a-z]*(\s)*)+(\s)*", year = "Year:\\s+[0-9]+(\s)*",
-                    director = "Director:\\s+([A-Z]+[a-z]*(\s)*)+(\s)*",
-                    cast = "Cast:\\s+(([A-Z]+[a-z]*(\s)*)+(,\s)*)+(\s)*", votes = "Votes:\\s+[0-9]+(\s)*";
+            String title = "Title:\\s+([A-Z]+[a-z]*(\\s)*)+(\\s)*", year = "Year:\\s+[0-9]+(\\s)*",
+                    director = "Director:\\s+([A-Z]+[a-z]*(\\s)*)+(\\s)*",
+                    cast = "Cast:\\s+(([A-Z]+[a-z]*(\\s)*)+(,\\s)*)+(\\s)*", votes = "Votes:\\s+[0-9]+(\\s)*";
         }
         movidaRegex reg = new movidaRegex();
         /*
@@ -213,32 +213,35 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     @Override
     public void clear() {
-        // TODO Auto-generated method stub
-
+        avl.makeEmpty();
+        //marco, da implementare
+        
     }
 
     @Override
     public int countMovies() {
-        // TODO Auto-generated method stub
-        return 0;
+        /*if(isAVL())*/ { return avl.size();}
+    	//else
     }
 
     @Override
     public int countPeople() {
-        // TODO Auto-generated method stub
+        if(isAVL()) {
+        	return avl.countPeople();
+        }
         return 0;
     }
 
     @Override
     public boolean deleteMovieByTitle(String title) {
-        // TODO Auto-generated method stub
+        avl.delete_by_title(title); //funzione void che elimina il nodo con il titolo in input
         return false;
     }
 
     @Override
     public Movie getMovieByTitle(String title) {
-        // TODO Auto-generated method stub
-        return null;
+        return avl.search_by_title(title).m;
+       
     }
 
     @Override

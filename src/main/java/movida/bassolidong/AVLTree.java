@@ -193,11 +193,65 @@ public class AVLTree extends AVLNode{
 		return r;
 	}
 	
+	public AVLNode search_by_title(String Title) {
+		return search_by_title(root,Title);
+	}
+	public void delete_by_title(String Title) {
+		delete_by_title(root,Title);
+	}
+	
+	
+	public AVLNode search_by_title(AVLNode r, String Title) {
+		boolean found=false;
+		
+		while((r != null) && !found) 
+		{
+			if(Title.compareTo(r.m.getTitle()) < 0) 
+			{
+				r = r.left;
+			}
+			else if(Title.compareTo(r.m.getTitle()) > 0) 
+			{
+				r= r.right;
+			}
+			else 
+			{
+				found=true;
+				return r;
+			}
+		}
+		return null;
+		
+	}
+	
+	public void delete_by_title(AVLNode r, String Title) {
+		boolean found=false;
+		
+		while((r != null) && !found) 
+		{
+			if(Title.compareTo(r.m.getTitle()) < 0) 
+			{
+				r = r.left;
+			}
+			else if(Title.compareTo(r.m.getTitle()) > 0) 
+			{
+				r= r.right;
+			}
+			else 
+			{
+				found=true;
+				remove(r.m);
+			}
+		}
+		
+		
+	}
 	
 	public boolean remove(Movie m) {
 		if(m==null) {
 			return false;
 		}
+		
 		if(search(root,m.getTitle())) {
 			root= remove(root,m);
 			return true;
@@ -254,5 +308,123 @@ public class AVLTree extends AVLNode{
 	
 	
 	
+	class Nodo{
+		String actor;
+		Nodo next;
+	}
+
+	public class List{
+		Nodo Head;
+		int size;
+		
+		public List() 
+		{
+			size=0;
+			Head=null;
+		}
+		
+	public void add(String a) 
+	{
+		Nodo newNodo= new Nodo();
+		newNodo.actor=a;
+		
+		if(Head==null) 
+		{
+			Head=newNodo;
+			Head.next= null;
+		}
+		
+		else if(Head.next == null) 
+		{
+			Head.next=newNodo;
+		}
+		
+		else 
+		{
+			Nodo iter = null;
+			for(iter=Head.next;iter.next != null; iter= iter.next);
+			iter.next=newNodo;
+		}
+		
+		size++;
+	}
+		
+	public boolean search(String a) 
+	{
+	    for(Nodo iter = Head; iter!=null; iter = iter.next) 
+	    {
+	            if (iter.actor==a) return true;
+	    }
+	    return false;
+	}
+
+	public void remove(String a, boolean all) 
+	{
+	    while(Head!=null && Head.actor==a) 
+	    {
+	        Head = Head.next;
+	        size--;
+	        if (!all || Head==null) return;
+	    }
+	    
+	    Nodo current = Head.next;
+	    Nodo previous = Head;
+	    for(; current!=null; current=current.next) 
+	    {
+	        if(current.actor == a) 
+	        {
+	            previous.next = current.next;
+	            current = previous;
+	            size--;
+	            if(!all) return;
+	        } 
+	        else 
+	        {
+	            previous = previous.next;
+	        }
+	    }
+	}
 	
+	public int size() {
+		return size;
+	}
+	
+	}
+	
+	List actor=null;
+	
+	//conta i nodi
+	public int countPeople() {
+		return countPeople(root);
+	}
+		public int countPeople(AVLNode r) 
+		{	
+		if(r != null)
+			{
+				AggiungiAllaLista(r);
+				countPeople(r.left);
+				countPeople(r.right);
+		
+			}
+		
+		return actor.size();
+		}
+	
+		
+	public void AggiungiAllaLista(AVLNode n) 
+	{
+		if(n != null) 
+		{
+			if( !actor.search( n.m.getDirector().getName() ) )  {  actor.add(n.m.getDirector().getName());   }
+			for(int i=n.m.getCast().length; i<0;i--) 
+			{
+				if( !actor.search(n.m.getCast()[i].getName())  ) { actor.add(n.m.getCast()[i].getName()); }
+			}
+			
+		}
+		
+		
+	}
+	
+		
 }
