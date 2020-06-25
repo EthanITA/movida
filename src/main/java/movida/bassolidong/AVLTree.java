@@ -10,373 +10,353 @@ public class AVLTree extends AVLNode {
 		root = null;
 	}
 
-	// controllo se l'albero è vuoto oppure no
 	public boolean isEmpty() {
-		return size() == 0;
+		return countNodes()== 0;
 	}
-
-	// traforma l'albero in un albero vuoto
+	
+	//get height
+	int height(AVLNode N) {
+		
+		if(N == null) {
+			return 0;
+		}
+		return N.height;
+	}
+	
+	//make empty
 	public void makeEmpty() {
 		root = null;
 	}
-
-	// ritorna l'altezza del nodo
-	public int height(AVLNode t) {
-		return t == null ? -1 : t.height;
-	}
-
-	public int size() {
-		return countNodes();
-	}
-
-	public boolean insert(Movie m) {
-		if (m == null)
-			return false;
-		if (!search(root, m.getTitle())) {
-			root = insert(root, m);
-			return true;
+	
+	// right rotate subtree
+	 AVLNode rightRotate(AVLNode y) { 
+	        AVLNode x = y.left; 
+	        AVLNode T2 = x.right; 
+	  
+	        // Perform rotation 
+	        x.right = y; 
+	        y.left = T2; 
+	  
+	        // Update heights 
+	        y.height = Math.max(height(y.left), height(y.right)) + 1; 
+	        x.height = Math.max(height(x.left), height(x.right)) + 1; 
+	  
+	        // Return new root 
+	        return x; 
+	    } 
+	
+	// left rotate subtree
+	
+	 AVLNode leftRotate(AVLNode x) { 
+		 AVLNode y = x.right; 
+		 AVLNode T2 = y.left; 
+	  
+	        // Perform rotation 
+	        y.left = x; 
+	        x.right = T2; 
+	  
+	        //  Update heights 
+	        x.height = Math.max(height(x.left), height(x.right)) + 1; 
+	        y.height = Math.max(height(y.left), height(y.right)) + 1; 
+	  
+	        // Return new root 
+	        return y; 
+	    } 
+	
+	 // Get Balance factor of AVLnode N 
+	    int getBalance(AVLNode N) { 
+	        if (N == null) 
+	            return 0; 
+	  
+	        return height(N.left) - height(N.right); 
+	    } 
+	 
+	    //insert
+	    AVLNode insert(Movie m) {
+	    	return insert(root,m);
+	    }
+	    AVLNode insert(AVLNode node, Movie m) {
+	    	
+	    	if(node == null) {
+	    		return(new AVLNode(m));
+	    	}
+	    	
+	    	if(m.getTitle().compareTo(node.m.getTitle()) < 0) 
+	    	{
+	    		node.left = insert(node.left, m); 
+	    	}
+	    	else if (m.getTitle().compareTo(node.m.getTitle()) > 0) 
+	    	{
+	            node.right = insert(node.right, m); 
+	        }
+	        else // Duplicate keys not allowed 
+	        {
+	        return node;
+	        }
+	    	
+	    	// Update height
+	    	node.height = 1 + Math.max(height(node.left),height(node.right)); 
+	    	
+	    	//get the balance factor to check if It's unbalanced
+	    	 int balance = getBalance(node); 
+	    	
+	    	 if (balance > 1 && m.getTitle().compareTo(node.m.getTitle()) < 0) 
+	            return rightRotate(node); 
+	  
+	        // Right Right Case 
+	        if (balance < -1 && m.getTitle().compareTo(node.m.getTitle()) > 0) 
+	            return leftRotate(node); 
+	  
+	        // Left Right Case 
+	        if (balance > 1 && m.getTitle().compareTo(node.m.getTitle()) > 0) { 
+	            node.left = leftRotate(node.left); 
+	            return rightRotate(node); 
+	        } 
+	  
+	        // Right Left Case 
+	        if (balance < -1 && m.getTitle().compareTo(node.m.getTitle()) < 0) { 
+	            node.right = rightRotate(node.right); 
+	            return leftRotate(node); 
+	        } 
+	    	
+	        return node; 
+	    }
+	    
+	    AVLNode minValueNode()  
+	    {  return minValueNode(root);  } 
+	    
+	    AVLNode minValueNode(AVLNode node)  
+	    {  
+	        AVLNode current = node;  
+	  
+	       
+	        while (current.left != null)  
+	        { current = current.left; } 
+	  
+	        return current;  
+	    } 
+	    
+	    
+	   //delete node
+	    AVLNode deleteNode(AVLNode root, Movie m)  
+	    {  
+	        // STEP 1: PERFORM STANDARD BST DELETE  
+	        if (root == null)  
+	            {	return root;  }
+	  
+	        // If the key to be deleted is smaller than  
+	        // the root's key, then it lies in left subtree  
+	        if (m.getTitle().compareTo(root.m.getTitle()) < 0)  
+	            root.left = deleteNode(root.left, m);  
+	  
+	        // If the key to be deleted is greater than the  
+	        // root's key, then it lies in right subtree  
+	        else if (m.getTitle().compareTo(root.m.getTitle()) > 0)  
+	            root.right = deleteNode(root.right, m);  
+	  
+	        // if key is same as root's key, then this is the node  
+	        // to be deleted  
+	        else
+	        {  
+	  
+	            // node with only one child or no child  
+	            if ((root.left == null) || (root.right == null))  
+	            {  
+	                AVLNode temp = null;  
+	                if (temp == root.left)  
+	                    temp = root.right;  
+	                else
+	                    temp = root.left;  
+	  
+	                // No child case  
+	                if (temp == null)  
+	                {  
+	                    temp = root;  
+	                    root = null;  
+	                }  
+	                else // One child case  
+	                    root = temp; // Copy the contents of  
+	                                // the non-empty child  
+	            }  
+	            else
+	            {  
+	  
+	                // node with two children: Get the inorder  
+	                // successor (smallest in the right subtree)  
+	                AVLNode temp = minValueNode(root.right);  
+	  
+	                // Copy the inorder successor's data to this node  
+	                root.m = temp.m;  
+	  
+	                // Delete the inorder successor  
+	                root.right = deleteNode(root.right, temp.m);  
+	            }  
+	        }  
+	  
+	        // If the tree had only one node then return  
+	        if (root == null)  
+	            {return root; } 
+	  
+	        //  UPDATE HEIGHT OF THE CURRENT NODE  
+	        root.height = Math.max(height(root.left), height(root.right)) + 1;  
+	  
+	        //GET THE BALANCE FACTOR OF THIS NODE (to check)  
+	        int balance = getBalance(root);  
+	  
+	        // If this node becomes unbalanced...
+	        if (balance > 1 && getBalance(root.left) >= 0)  
+	            return rightRotate(root);  
+	  
+	        // Left Right Case  
+	        if (balance > 1 && getBalance(root.left) < 0)  
+	        {  
+	            root.left = leftRotate(root.left);  
+	            return rightRotate(root);  
+	        }  
+	  
+	        // Right Right Case  
+	        if (balance < -1 && getBalance(root.right) <= 0)  
+	            return leftRotate(root);  
+	  
+	        // Right Left Case  
+	        if (balance < -1 && getBalance(root.right) > 0)  
+	        {  
+	            root.right = rightRotate(root.right);  
+	            return leftRotate(root);  
+	        }  
+	  
+	        return root;  
+	    }  
+	    
+	    public boolean searchNode(String Title) {
+			return searchNode(root, Title);
 		}
-		return false;
-	}
 
-	public AVLNode insert(AVLNode n, Movie m) {
-		// caso base
-		if (n == null)
-			return new AVLNode(m);
+		// search title
+		public boolean searchNode(AVLNode r, String Title) {
+			boolean found = false;
 
-		int cmp = m.getTitle().compareTo(n.m.getTitle());
+			while ((r != null) && !found) 
+			{
+				if (Title.compareTo(r.m.getTitle()) < 0) 
+				{
+					r = r.left;
+				} 
+				else if (Title.compareTo(r.m.getTitle()) > 0) 
+				{
+					r = r.right;
+				} 
+				else 
+				{
+					found = true;
+					break;
+				}
 
-		if (cmp < 0) {
-			n.left = insert(n.left, m);
-		} else {
-			n.right = insert(n.right, m);
-		}
-
-		update(n);
-
-		return balance(n);
-
-	}
-
-	public int countNodes() {
-		return countNodes(root);
-	}
-
-	// conta i nodi
-	public int countNodes(AVLNode r) {
-
-		if (r == null) {
-			return 0;
-		} else {
-			int l = 1;
-			l = l + countNodes(r.left);
-			l = l + countNodes(r.right);
-
-			return l;
-		}
-	}
-
-	public boolean search(String Title) {
-		return search(root, Title);
-	}
-
-	// cerca un titolo di un film
-	public boolean search(AVLNode r, String Title) {
-		boolean found = false;
-
-		while ((r != null) && !found) {
-			if (Title.compareTo(r.m.getTitle()) < 0) {
-				r = r.left;
-			} else if (Title.compareTo(r.m.getTitle()) > 0) {
-				r = r.right;
-			} else {
-				found = true;
-				break;
+				found = searchNode(r, Title);
 			}
 
-			found = search(r, Title);
+			return found;
 		}
+	    
+		// count Number of nodes
+		public int countNodes() {
+			return countNodes(root);
+		}
+		public int countNodes(AVLNode r) {
 
-		return found;
-	}
+			if (r == null) {return 0;} 
+			
+			else 
+			{
+				int nodes = 1;
+				nodes = nodes + countNodes(r.left);
+				nodes = nodes + countNodes(r.right);
 
-	public void update(AVLNode n) {
-		int leftNodeHeight = (n.left == null) ? -1 : n.left.height;
-		int rightNodeHeight = (n.right == null) ? -1 : n.right.height;
-
-		n.height = 1 + Math.max(leftNodeHeight, rightNodeHeight);
-		n.balancefactor = rightNodeHeight - leftNodeHeight;
-	}
-
-	public AVLNode balance(AVLNode n) {
-		if (n.balancefactor == -2) {
-			if (n.left.balancefactor <= 0) {
-				return leftLeftCase(n);
-			} else {
-				return leftRightCase(n);
-			}
-
-		} else if (n.right.balancefactor == 2) {
-			if (n.right.balancefactor >= 0) {
-				return rightRightCase(n);
-			} else {
-				return rightLeftCase(n);
+				return nodes;
 			}
 		}
-		return n;
-	}
-
-	public AVLNode leftLeftCase(AVLNode n) {
-		return rightRotation(n);
-	}
-
-	public AVLNode leftRightCase(AVLNode n) {
-		n.left = leftRotation(n.left);
-		return leftLeftCase(n);
-	}
-
-	public AVLNode rightRightCase(AVLNode n) {
-		return leftRotation(n);
-	}
-
-	public AVLNode rightLeftCase(AVLNode n) {
-		n.right = rightRotation(n.right);
-		return rightRightCase(n);
-	}
-
-	public AVLNode leftRotation(AVLNode n) {
-		AVLNode newparent = n.right;
-		n.right = newparent.left;
-		newparent.left = n;
-		update(n);
-		update(newparent);
-
-		return newparent;
-	}
-
-	public AVLNode rightRotation(AVLNode n) {
-		AVLNode newparent = n.left;
-		n.left = newparent.right;
-		newparent.right = n;
-		update(n);
-		update(newparent);
-
-		return newparent;
-	}
-
-	public AVLNode findMax(AVLNode r) {
-		while (r.right != null) {
-			r = r.right;
+	    
+		public AVLNode search_by_title(String Title) {
+			return search_by_title(root, Title);
 		}
-		return r;
-	}
 
-	public AVLNode findMin(AVLNode r) {
-		while (r.left != null) {
-			r = r.left;
+		public void delete_by_title(String Title) {
+			delete_by_title(root, Title);
 		}
-		return r;
-	}
 
-	public AVLNode search_by_title(String Title) {
-		return search_by_title(root, Title);
-	}
+		public AVLNode search_by_title(AVLNode r, String Title) {
+			boolean found = false;
 
-	public void delete_by_title(String Title) {
-		delete_by_title(root, Title);
-	}
-
-	public AVLNode search_by_title(AVLNode r, String Title) {
-		boolean found = false;
-
-		while ((r != null) && !found) {
-			if (Title.compareTo(r.m.getTitle()) < 0) {
-				r = r.left;
-			} else if (Title.compareTo(r.m.getTitle()) > 0) {
-				r = r.right;
-			} else {
-				found = true;
-				return r;
+			while ((r != null) && !found) {
+				if (Title.compareTo(r.m.getTitle()) < 0) {
+					r = r.left;
+				} else if (Title.compareTo(r.m.getTitle()) > 0) {
+					r = r.right;
+				} else {
+					found = true;
+					return r;
+				}
 			}
-		}
-		return null;
-
-	}
-
-	public void delete_by_title(AVLNode r, String Title) {
-		boolean found = false;
-
-		while ((r != null) && !found) {
-			if (Title.compareTo(r.m.getTitle()) < 0) {
-				r = r.left;
-			} else if (Title.compareTo(r.m.getTitle()) > 0) {
-				r = r.right;
-			} else {
-				found = true;
-				remove(r.m);
-			}
-		}
-
-	}
-
-	public boolean remove(Movie m) {
-		if (m == null) {
-			return false;
-		}
-
-		if (search(root, m.getTitle())) {
-			root = remove(root, m);
-			return true;
-		}
-		return false;
-	}
-
-	public AVLNode remove(AVLNode r, Movie m) {
-		if (r == null) {
 			return null;
+
 		}
 
-		if (m.getTitle().compareTo(r.m.getTitle()) < 0) {
-			r.left = remove(r.left, m);
-		} else if (m.getTitle().compareTo(r.m.getTitle()) > 0) {
-			r.right = remove(r.right, m);
-		} else {
-			// caso con solo sottoalbero destro o nessun sottoalbero
-			if (r.left == null) {
-				return r.right;
+		public void delete_by_title(AVLNode node, String Title) {
+			boolean found = false;
+			node=root;
+			
+			while ((node != null) && !found) 
+			{
+				if (Title.compareTo(node.m.getTitle()) < 0) {
+					node = node.left;
+				} 
+				
+				else if (Title.compareTo(node.m.getTitle()) > 0) {
+					node = node.right;
+				} 
+				
+				else {
+					found = true;
+					break;
+				}
+			}
+			if(found) {
+				deleteNode(root,node.m);
+			}
+		}
+		
+		ActorList actor = null;
+
+		// conta i nodi
+		public int countPeople() {
+			return countPeople(root);
+		}
+
+		public int countPeople(AVLNode r) {
+			if (r != null) {
+				AggiungiAllaLista(r);
+				countPeople(r.left);
+				countPeople(r.right);
+
 			}
 
-			// caso con solo sottoalbero sinistro o nessun sottalbero
-			else if (r.right == null) {
-				return r.left;
-			} else {
-				// rimuovi dal sottoalbero sx
-				if (r.left.height > r.right.height) {
-					AVLNode succ = findMax(r.left);
-					r.m = succ.m;
-
-					r.left = remove(r.left, succ.m);
-				} else {
-					AVLNode succ = findMin(r.right);
-					r.m = succ.m;
-
-					r.right = remove(r.right, succ.m);
-
+			return actor.size();
+		}
+		
+		public void AggiungiAllaLista(AVLNode n) {
+			if (n != null) {
+				if (!(actor.search(n.m.getDirector().getName()))) {
+					actor.add(n.m.getDirector().getName());
+				}
+				for (int i =0; i < n.m.getCast().length; i++) {
+					if (!(actor.search(n.m.getCast()[i].getName()))) {
+						actor.add(n.m.getCast()[i].getName());
+					}
 				}
 
 			}
 
 		}
-
-		update(r);
-		return balance(r);
-	}
-
-	class Nodo {
-		String actor;
-		Nodo next;
-	}
-
-	public class List {
-		Nodo Head;
-		int size;
-
-		public List() {
-			size = 0;
-			Head = null;
-		}
-
-		public void add(String a) {
-			Nodo newNodo = new Nodo();
-			newNodo.actor = a;
-
-			if (Head == null) {
-				Head = newNodo;
-				Head.next = null;
-			}
-
-			else if (Head.next == null) {
-				Head.next = newNodo;
-			}
-
-			else {
-				Nodo iter = null;
-				for (iter = Head.next; iter.next != null; iter = iter.next)
-					;
-				iter.next = newNodo;
-			}
-
-			size++;
-		}
-
-		public boolean search(String a) {
-			for (Nodo iter = Head; iter != null; iter = iter.next) {
-				if (iter.actor == a)
-					return true;
-			}
-			return false;
-		}
-
-		public void remove(String a, boolean all) {
-			while (Head != null && Head.actor == a) {
-				Head = Head.next;
-				size--;
-				if (!all || Head == null)
-					return;
-			}
-
-			Nodo current = Head.next;
-			Nodo previous = Head;
-			for (; current != null; current = current.next) {
-				if (current.actor == a) {
-					previous.next = current.next;
-					current = previous;
-					size--;
-					if (!all)
-						return;
-				} else {
-					previous = previous.next;
-				}
-			}
-		}
-
-		public int size() {
-			return size;
-		}
-
-	}
-
-	List actor = null;
-
-	// conta i nodi
-	public int countPeople() {
-		return countPeople(root);
-	}
-
-	public int countPeople(AVLNode r) {
-		if (r != null) {
-			AggiungiAllaLista(r);
-			countPeople(r.left);
-			countPeople(r.right);
-
-		}
-
-		return actor.size();
-	}
-
-	public void AggiungiAllaLista(AVLNode n) {
-		if (n != null) {
-			if (!actor.search(n.m.getDirector().getName())) {
-				actor.add(n.m.getDirector().getName());
-			}
-			for (int i = n.m.getCast().length; i < 0; i--) {
-				if (!actor.search(n.m.getCast()[i].getName())) {
-					actor.add(n.m.getCast()[i].getName());
-				}
-			}
-
-		}
-
-	}
-
+		
+		
 }

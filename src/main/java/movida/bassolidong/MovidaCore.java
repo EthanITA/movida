@@ -59,9 +59,14 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      */
     public static void main(String[] args) {
         MovidaCore mc = new MovidaCore(10);
-        mc.loadFromFile(
+       /* mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
-        System.out.println(mc.countMovies());
+        System.out.println(mc.countMovies());*/
+        mc.loadFromFile(
+                new File("C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
+        
+        /*mc.countMovies();*/
+        System.out.println(mc.countPeople());
 
     }
 
@@ -309,7 +314,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     @Override
     public int countMovies() {
         /* if(isAVL()) */ {
-            return avl.size();
+            return avl.countNodes();
         }
         // else
     }

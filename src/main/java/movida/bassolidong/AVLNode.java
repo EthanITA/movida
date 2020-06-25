@@ -5,9 +5,12 @@ import movida.commons.Movie;
 //classe avl node
 public class AVLNode {
 	
-	AVLNode left, right;
 	Movie m;
-	int height, balancefactor;
+	int height;
+	
+	AVLNode left, right;
+	
+	
 	
 //costruttori
 	AVLNode()
@@ -18,7 +21,7 @@ public class AVLNode {
 		m=null;
 		
 		height=0;
-		balancefactor=0;
+		
 	}
 	
 	AVLNode(Movie m){
@@ -28,8 +31,7 @@ public class AVLNode {
 		
 		this.m=m;
 		
-		height=0;
-		balancefactor=0;
+		height=1;
 		
 	}
 	
