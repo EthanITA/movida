@@ -2,7 +2,9 @@ package movida.bassolidong;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import movida.bassolidong.custom_classes.ArrayOutOfSizeException;
 import movida.commons.Movie;
@@ -39,6 +41,29 @@ public class HashIndirizzamentoAperto {
             record[i] = new HashTable();
         }
 
+    }
+
+    public int countMovies() {
+        int count = 0;
+        for (HashTable hashTable : record) {
+            if (hashTable.key != null) {
+                count += 1;
+            }
+        }
+        return count;
+    }
+
+    public Set<String> getAllPeoplesName() {
+        Set<String> setOfPeoplesName = new HashSet<>();
+        for (HashTable h : record) {
+            if (h.key != null) {
+                for (Person person : h.data.get(0).getCast()) {
+                    setOfPeoplesName.add(person.getName());
+                }
+                setOfPeoplesName.add(h.data.get(0).getDirector().getName());
+            }
+        }
+        return setOfPeoplesName;
     }
 
     public HashTable[] getHashTable() {
