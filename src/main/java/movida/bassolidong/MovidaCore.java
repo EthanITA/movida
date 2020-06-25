@@ -131,22 +131,22 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     private List<Person> stringToListPersons(String s) {
         List<Person> result = new ArrayList<>();
-        boolean skip_space = false;
-        String person_name = "";
+        boolean skipSpace = false;
+        StringBuilder personName = new StringBuilder();
         for (char c : s.toCharArray()) {
             if (c == ',') {
-                skip_space = true;
-                result.add(new Person(person_name));
-                person_name = "";
+                skipSpace = true;
+                result.add(new Person(personName.toString()));
+                personName = new StringBuilder();
             } else {
-                if (skip_space) {
-                    skip_space = false;
+                if (skipSpace) {
+                    skipSpace = false;
                 } else {
-                    person_name += c;
+                    personName.append(c);
                 }
             }
         }
-        result.add(new Person(person_name));
+        result.add(new Person(personName.toString()));
         return result;
     }
 
