@@ -34,7 +34,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     // Le due variabili rappresentano il tipo di algoritmo da utilizzare
 
     // BubbleSort e MergeSort
-    private SortingAlgorithm algorithm;
+    private SortingAlgorithm algorithm = SortingAlgorithm.MergeSort;
     // AVL e HashIndirizzamentoAperto
     private MapImplementation dataStructure = MapImplementation.HashIndirizzamentoAperto;
 
@@ -63,18 +63,23 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
         System.out.println(mc.getAllPeople().length);
-        for (Person p : mc.getAllPeople()) {
-            System.out.println(p);
+        System.out.println(" ");
+        for (Movie m : mc.searchMostVotedMovies(10)) {
+            System.out.println(m.getTitle() + "\t" + m.getVotes() + "\t" + m.getYear());
+        }
+        System.out.println(" ");
+        for (Person p : mc.searchMostActiveActors(10)) {
+            System.out.println(p.getName());
+        }
+        System.out.println(" ");
+        for (Movie m : mc.searchMostRecentMovies(10)) {
+            System.out.println(m.getTitle() + "\t" + m.getVotes() + "\t" + m.getYear());
         }
 
-        mc.setMap(MapImplementation.AVL);
         // mc.loadFromFile(new File(
         // "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
 
         /* mc.countMovies(); */
-        System.out.println(mc.countPeople());
-        mc.clear();
-        System.out.println(mc.countPeople());
 
     }
 
@@ -226,11 +231,15 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      */
     private Integer[] sort(Integer[] array) {
         // TODO restituire gli indici invece degli elementi!!
+        // Utilizzare il metodo sortIndex di ArrayUtils per farlo
+        // public Integer[] sortIndex(Integer[] sortedArray, Integer[] unsortedArray)
 
         Integer[] result = new Integer[array.length];
+
         if (isBubbleSort()) {
         } else {
-
+            MergeSort ms = new MergeSort(array);
+            result = ms.getReverseSortedIndexes();
         }
         return result;
     }
