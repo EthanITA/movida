@@ -8,7 +8,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,11 +68,11 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
         System.out.println(mc.getAllPeople().length);
         System.out.println(" ");
-        for (Movie m : mc.searchMostVotedMovies(10)) {
+        for (Movie m : mc.searchMostVotedMovies(110)) {
             System.out.println(m.getTitle() + "\t" + m.getVotes() + "\t" + m.getYear());
         }
         System.out.println(" ");
-        for (Person p : mc.searchMostActiveActors(10)) {
+        for (Person p : mc.searchMostActiveActors(33)) {
             System.out.println(p.getName());
         }
         System.out.println(" ");
@@ -229,7 +233,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      * @param array
      * @return
      */
-    private Integer[] sort(Integer[] array) {
+    private Integer[] sortIndexes(Integer[] array) {
         // TODO restituire gli indici invece degli elementi!!
         // Utilizzare il metodo sortIndex di ArrayUtils per farlo
         // public Integer[] sortIndex(Integer[] sortedArray, Integer[] unsortedArray)
@@ -252,8 +256,8 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      * @return array filtrato
      */
     private Movie[] firstMovies(Integer n, Movie[] array) {
-        Movie[] result = new Movie[n];
-        for (int i = 0; i < n; i++) {
+        Movie[] result = new Movie[Math.min(n, array.length)];
+        for (int i = 0; i < Math.min(n, array.length); i++) {
             result[i] = array[i];
         }
         return result;
@@ -347,38 +351,6 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     }
 
     /**
-     * Conta le occorrenze tra tutti i Movie dato il nome di un attore
-     * 
-     * @param name
-     * @return
-     */
-    private Integer findActorOccurence(String name) {
-        Integer count = 0;
-        for (Movie m : getAllMovies()) {
-            for (Person p : m.getCast()) {
-                if (p.getName().equals(name)) {
-                    count += 1;
-                }
-            }
-        }
-        return count;
-    }
-
-    /**
-     * Conta le occorrenze per ogni attore
-     * 
-     * @param persons
-     * @return array di interi associato all'attore
-     */
-    private Integer[] getActorsOccurence(Person[] persons) {
-        Integer[] occurence = new Integer[persons.length];
-        for (int i = 0; i < occurence.length; i++) {
-            occurence[i] = findActorOccurence(persons[i].getName());
-        }
-        return occurence;
-    }
-
-    /**
      * Ordina Person[] secondo l'ordine di <code>indexes</code>
      * 
      * @param persons
@@ -401,9 +373,62 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      * @return
      */
     private Person[] firstPersons(Integer n, Person[] p) {
-        Person[] result = new Person[n];
-        for (int i = 0; i < n; i++) {
+        Person[] result = new Person[Math.min(n, p.length)];
+        for (int i = 0; i < Math.min(n, p.length); i++) {
             result[i] = p[i];
+        }
+        return result;
+    }
+
+    /**
+     * ritorna ogni elemento in campo cast per tutti i movie, comprendente doppioni
+     * 
+     * @return
+     */
+    Person[] getAllCast() {
+        List<Person> result = new ArrayList<>();
+        for (Movie m : getAllMovies()) {
+            Collections.addAll(result, m.getCast());
+        }
+        Person[] arr = new Person[result.size()];
+        return result.toArray(arr);
+    }
+
+    /**
+     * Per ogni elemento in <code>a1</code> conta le occorenze in <code>a2</code>.
+     * 
+     * @param a1
+     * @param a2
+     * @return array di conteggi associato ad <code>a1</code>
+     */
+    Integer[] counter(Person[] a1, Person[] a2) {
+        Integer[] result = new Integer[a1.length];
+        Arrays.fill(result, 0);
+        for (int i = 0; i < a1.length; i++) {
+            for (Person person : a2) {
+                if (person.getName().equals(a1[i].getName())) {
+                    result[i] += 1;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * rimuove i doppioni in Person[]
+     * 
+     * @param person
+     * @return
+     */
+    Person[] removeDoubles(Person[] person) {
+        Set<String> mySet = new HashSet<>();
+        for (Person p : person) {
+            mySet.add(p.getName());
+        }
+        List<String> temp = new ArrayList<>(mySet);
+        Person[] result = new Person[mySet.size()];
+        for (int i = 0; i < temp.size(); i++) {
+            result[i] = new Person(temp.get(i));
         }
         return result;
     }
@@ -636,19 +661,21 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     @Override
     public Movie[] searchMostVotedMovies(Integer N) {
-        return firstMovies(N, sortMoviesWithIndexes(sort(getFieldsAsArray(m -> m.getVotes()))));
+        return firstMovies(N, sortMoviesWithIndexes(sortIndexes(getFieldsAsArray(m -> m.getVotes()))));
     }
 
     @Override
     public Movie[] searchMostRecentMovies(Integer N) {
-        return firstMovies(N, sortMoviesWithIndexes(sort(getFieldsAsArray(m -> m.getYear()))));
+        return firstMovies(N, sortMoviesWithIndexes(sortIndexes(getFieldsAsArray(m -> m.getYear()))));
     }
 
     @Override
     public Person[] searchMostActiveActors(Integer N) {
-        Person[] persons = getAllPeople();
-        Integer[] indexes = getActorsOccurence(persons);
-        return firstPersons(N, sortPersonsWithIndexes(persons, indexes));
+        Person[] allCastWithDoubles = getAllCast();
+        Person[] allCast = removeDoubles(allCastWithDoubles);
+
+        return firstPersons(N, sortPersonsWithIndexes(allCast, sortIndexes(counter(allCast, allCastWithDoubles))));
+
     }
 
     /* FINE IMovidaSearch */
