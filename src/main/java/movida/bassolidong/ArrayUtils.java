@@ -61,4 +61,12 @@ public class ArrayUtils {
         }
         return result;
     }
+
+    public Integer[] reverse(Integer[] array) {
+        Integer[] result = new Integer[array.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = array[result.length - 1 - i];
+        }
+        return result;
+    }
 }

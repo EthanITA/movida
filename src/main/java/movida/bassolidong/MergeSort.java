@@ -11,6 +11,7 @@ public class MergeSort {
     private Integer[] sortedArray;
     private Integer[] toSortIndexes;
     private Integer[] sortedIndexes;
+    private ArrayUtils arrayUtils;
 
     private Integer[] listOfIntegerToArray(List<Integer> l) {
         Integer[] result = new Integer[l.size()];
@@ -28,7 +29,7 @@ public class MergeSort {
             toSortIndexes[i] = i;
         }
         sort();
-        ArrayUtils arrayUtils = new ArrayUtils();
+        arrayUtils = new ArrayUtils();
         sortedIndexes = arrayUtils.sortIndex(sortedArray, toSortArray);
     }
 
@@ -85,16 +86,8 @@ public class MergeSort {
         return sortedArray;
     }
 
-    public Integer[] reverse(Integer[] array) {
-        Integer[] result = new Integer[array.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = array[result.length - 1 - i];
-        }
-        return result;
-    }
-
     public Integer[] getReverseSortedArray() {
-        return reverse(sortedArray);
+        return arrayUtils.reverse(sortedArray);
     }
 
     public Integer[] getSortedIndexes() {
@@ -102,7 +95,7 @@ public class MergeSort {
     }
 
     public Integer[] getReverseSortedIndexes() {
-        return reverse(sortedIndexes);
+        return arrayUtils.reverse(sortedIndexes);
     }
 
     public static void main(String[] args) {
