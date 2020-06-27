@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,9 +48,17 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      * 
      * @param size dimensione dell'array di hash table
      */
-    public MovidaCore(int size) {
-        avl = new AVLTree();
+    public MovidaCore(int size, AVLTree avlNode) {
+        avl = avlNode;
         hash = new HashIndirizzamentoAperto(size);
+
+
+        /* mc.loadFromFile(
+                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
+         System.out.println(mc.getAllPeople().length);
+         for (Person p : mc.getAllPeople()) {
+             System.out.println(p);
+         }*/
     }
 
     /**
@@ -58,23 +67,77 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      * @param args The arguments of the program.
      */
     public static void main(String[] args) {
-        MovidaCore mc = new MovidaCore(10);
+    	AVLTree avl = new AVLTree();
+    	MovidaCore mc = new MovidaCore(10, avl);
+    	
+    	
+    	mc.setMap(MapImplementation.AVL);
+    	mc.loadFromFile(new File("C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
+    	System.out.println("Movie: "+mc.countMovies()); 
+    	System.out.println("People: "+ mc.countPeople()); 
+    	
+    	int i=0;
+    	for(Movie m: mc.getAllMovies()) {
+    		i++;
+    		System.out.println(i+"  "+m.getTitle());
+    	}
+    	mc.deleteMovieByTitle("Contact");
+    	System.out.println();
+    	System.out.println("Movie: "+mc.countMovies()); 
+    	System.out.println("People: "+ mc.countPeople()); 
+    	 i=0;
+    	for(Movie m: mc.getAllMovies()) {
+    		i++;
+    		System.out.println(i+"  "+m.getTitle());
+    	}
 
-       /* mc.loadFromFile(
-                new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));*/
-        System.out.println(mc.getAllPeople().length);
-        for (Person p : mc.getAllPeople()) {
-            System.out.println(p);
-        }
-
-        mc.setMap(MapImplementation.AVL);
-         mc.loadFromFile(new File(
-         "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
-
-        /* mc.countMovies(); */
-        System.out.println(mc.countPeople());
-        mc.clear();
-        System.out.println(mc.countPeople());
+    	
+    	 /*
+    	//FOR DEBUG(LORENZO)
+    	Movie m = new Movie("ciao", 200, 300, null, null);
+        
+        System.out.println("Numero Nodi:"+avl.size());
+        System.out.println("Altezza Albero:"+avl.height_tree());
+        
+        System.out.println("Inserisco il primo nodo ciao");
+        avl.insert(m);
+        System.out.println("Numero Nodi:"+avl.size());
+        System.out.println("Altezza Albero:"+avl.height_tree());
+        
+        Movie m2 = new Movie("zaino", 200, 300, null, null);
+        
+        System.out.println("Inserisco il secondo nodo zaino");
+        avl.insert(m2);
+        System.out.println("Numero Nodi:"+avl.size());
+        System.out.println("Altezza Albero:"+avl.height_tree());
+        
+        Movie m3 = new Movie("elefante", 200, 300, null, null);
+        
+        System.out.println("Inserisco il terzo nodo elefante");
+        avl.insert(m3); 
+        System.out.println("Numero Nodi:"+avl.size());
+        System.out.println("Altezza Albero:"+avl.height_tree());
+        
+        Movie m4 = new Movie("zuzzurellone", 200, 300, null, null);
+ 
+        System.out.println("Inserisco il quarto nodo zuzzurellone");
+        avl.insert(m4); 
+        System.out.println("Numero Nodi:"+avl.size());
+        System.out.println("Altezza Albero:"+avl.height_tree());
+        
+        System.out.println("Elimino nodo zuzzurellone");
+        avl.remove(m4); 
+        System.out.println("Numero Nodi:"+avl.size());
+        System.out.println("Altezza Albero:"+avl.height_tree());
+        
+        
+        */
+    
+        /*System.out.println(mc.countPeople());
+        System.out.println(mc.countMovies());
+        mc.deleteMovieByTitle("Taxi Driver");
+        System.out.println(mc.countMovies());
+        System.out.println(mc.countPeople());*/
 
     }
 
@@ -467,7 +530,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     @Override
     public int countMovies() {
         if (isAVL()) {
-            return avl.countNodes();
+            return avl.size();
         } else {
             return hash.countMovies();
         }
@@ -484,14 +547,18 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     @Override
     public boolean deleteMovieByTitle(String title) {
-        avl.delete_by_title(title); // funzione void che elimina il nodo con il titolo in input
-        return hash.delete(title);
+        if(isAVL()) {
+        	avl.deleteMovieByTitle(title);
+        	return true;
+        }
+        else {
+        return hash.delete(title);}
     }
 
     @Override
     public Movie getMovieByTitle(String title) {
         if (isAVL()) {
-            return avl.search_by_title(title).m;
+            return avl.getMovieByTitle(title);
         } else {
             return hash.get(title).isEmpty() ? null : hash.get(title).get(0);
         }
@@ -500,16 +567,23 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     @Override
     public Person getPersonByName(String name) {
-        // TODO Auto-generated method stub
-        return null;
+    	  if (isAVL()) {
+              return avl.getPersonByName(name);
+          } 
+    	  else {//TODO 
+    		  return null;
+          }
+    	 
     }
 
     @Override
     public Movie[] getAllMovies() {
         Movie[] m;
         if (isAVL()) {
-            // TODO lorenzo
-            m = new Movie[0];
+        	Set<Movie> MovieSet = avl.getMovieSet();
+        	Movie[] MoviesArray = new Movie[MovieSet.size()];
+        	return MovieSet.toArray(MoviesArray);
+            
         } else {
             HashTable[] h = hash.getHashTable();
             List<Movie> mtemp = new ArrayList<>();
@@ -529,9 +603,12 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     public Person[] getAllPeople() {
         Person[] p;
         if (isAVL()) {
-            // TODO lorenzo
-            return new Person[0];
-        } else {
+        	Set<Person> personSet = avl.getPersonSet();
+        	Person[] personArray = new Person[personSet.size()];
+        	return personSet.toArray(personArray);
+        } 
+        
+        else {
             if (!hash.getAllPeoplesName().isEmpty()) {
                 List<String> peoplesName = new ArrayList<>(hash.getAllPeoplesName());
                 p = new Person[peoplesName.size()];
