@@ -16,8 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.graphstream.graph.Graph;
-
+import movida.bassolidong.Graph;
 import movida.bassolidong.HashIndirizzamentoAperto.HashTable;
 import movida.bassolidong.custom_classes.ArrayOutOfSizeException;
 import movida.bassolidong.custom_classes.LambdaExpressions;
@@ -48,6 +47,8 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     // hash ha come chiavi Title
     private HashIndirizzamentoAperto hash;
 
+    private Graph<String> graph;
+
     /**
      * Inizializza la hash table e AVL
      * 
@@ -56,13 +57,22 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     public MovidaCore(int size) {
         avl = new AVLTree();
         hash = new HashIndirizzamentoAperto(size);
-
+        graph = new Graph<>();
         /*
          * mc.loadFromFile( new File(
          * "/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"
          * )); System.out.println(mc.getAllPeople().length); for (Person p :
          * mc.getAllPeople()) { System.out.println(p); }
          */
+    }
+
+    public boolean search(Person[] p, String s2) {
+        for (Person pp : p) {
+            if (s2.equals(pp.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -72,31 +82,33 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      */
     public static void main(String[] args) {
         MovidaCore mc = new MovidaCore(10);
-
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
-        mc.setMap(MapImplementation.AVL);
-        mc.setSort(SortingAlgorithm.BubbleSort);
-        System.out.println(mc.getAllMovies().length);
-        mc.deleteMovieByTitle("Scface");
-        System.out.println(mc.getAllMovies().length);
 
-        for (Movie m : mc.searchMostVotedMovies(110)) {
-            System.out.println(m.getTitle() + "\t" + m.getVotes() + "\t" + m.getYear());
-        }
-        System.out.println(" ");
-        for (Person p : mc.searchMostActiveActors(33)) {
-            System.out.println(p.getName());
-        }
-        System.out.println(" ");
-        for (Movie m : mc.searchMostRecentMovies(10)) {
-            System.out.println(m.getTitle() + "\t" + m.getVotes() + "\t" + m.getYear());
-        }
-
-        // mc.loadFromFile(new File(
-        // "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"));
-
-        /* mc.countMovies(); */
+        /*
+         * MovidaCore mc = new MovidaCore(10);
+         * 
+         * mc.loadFromFile( new File(
+         * "/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"
+         * )); mc.setMap(MapImplementation.AVL);
+         * mc.setSort(SortingAlgorithm.BubbleSort);
+         * System.out.println(mc.getAllMovies().length);
+         * mc.deleteMovieByTitle("Scface");
+         * System.out.println(mc.getAllMovies().length);
+         * 
+         * for (Movie m : mc.searchMostVotedMovies(110)) {
+         * System.out.println(m.getTitle() + "\t" + m.getVotes() + "\t" + m.getYear());
+         * } System.out.println(" "); for (Person p : mc.searchMostActiveActors(33)) {
+         * System.out.println(p.getName()); } System.out.println(" "); for (Movie m :
+         * mc.searchMostRecentMovies(10)) { System.out.println(m.getTitle() + "\t" +
+         * m.getVotes() + "\t" + m.getYear()); }
+         * 
+         * // mc.loadFromFile(new File( //
+         * "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"
+         * ));
+         * 
+         * // mc.countMovies();
+         */
 
     }
 
@@ -481,6 +493,29 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
             e.printStackTrace();
 
         }
+
+        // creo il grafo di collaboratori
+        Person[] doublesCast = getAllCast();
+        Set<String> cast = new HashSet<>();
+        // rimuovo i doppioni in getAllCast()
+        for (Person p : doublesCast) {
+            cast.add(p.getName());
+        }
+        // per ogni nome di una persona creo un nodo
+        for (String s : cast) {
+            graph.addVertex(s);
+        }
+        // aggiungo i vertici per ogni collaboratore
+        for (String s : cast) {
+            for (Movie m : getAllMovies()) {
+                if (search(m.getCast(), s)) {
+                    for (Person p : m.getCast()) {
+                        graph.addEdge(s, p.getName());
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
