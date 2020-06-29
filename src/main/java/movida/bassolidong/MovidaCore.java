@@ -47,7 +47,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     // hash ha come chiavi Title
     private HashIndirizzamentoAperto hash;
 
-    private Graph<String> graph;
+    private Graph graph;
 
     /**
      * Inizializza la hash table e AVL
@@ -57,7 +57,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     public MovidaCore(int size) {
         avl = new AVLTree();
         hash = new HashIndirizzamentoAperto(size);
-        graph = new Graph<>();
+        graph = new Graph();
         /*
          * mc.loadFromFile( new File(
          * "/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"
@@ -84,6 +84,17 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         MovidaCore mc = new MovidaCore(10);
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
+        System.out.println(mc.graph.getNOfConnectedComponents());
+        for (Set<String> subgraph : mc.graph.getDisconnectedSubgraphs()) {
+            System.out.println(subgraph);
+        }
+        for (Person p : mc.getDirectCollaboratorsOf(new Person("Jessica Lange"))) {
+            System.out.println(p.getName());
+        }
+        System.out.println("-------");
+        for (Person p : mc.getTeamOf(new Person("Jessica Lange"))) {
+            System.out.println(p.getName());
+        }
 
         /*
          * MovidaCore mc = new MovidaCore(10);
@@ -259,7 +270,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      * @return
      */
     private Integer[] sortIndexes(Integer[] array) {
-        // TODO restituire gli indici invece degli elementi!!
+        // restituire gli indici invece degli elementi!!
         // Utilizzare il metodo sortIndex di ArrayUtils per farlo
         // public Integer[] sortIndex(Integer[] sortedArray, Integer[] unsortedArray)
 
@@ -461,6 +472,30 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         return result;
     }
 
+    private void initGraph() {
+        // creo il grafo di collaboratori
+        Person[] doublesCast = getAllCast();
+        Set<String> cast = new HashSet<>();
+        // rimuovo i doppioni in getAllCast()
+        for (Person p : doublesCast) {
+            cast.add(p.getName());
+        }
+        // per ogni nome di una persona creo un nodo
+        for (String s : cast) {
+            graph.addVertex(s);
+        }
+        // aggiungo i vertici per ogni collaboratore
+        for (String s : cast) {
+            for (Movie m : getAllMovies()) {
+                if (search(m.getCast(), s)) {
+                    for (Person p : m.getCast()) {
+                        graph.addEdge(s, p.getName());
+                    }
+                }
+            }
+        }
+    }
+
     /////////////////////////////////////////////////////
 
     /* INIZIO IMovidaDB */
@@ -494,27 +529,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
         }
 
-        // creo il grafo di collaboratori
-        Person[] doublesCast = getAllCast();
-        Set<String> cast = new HashSet<>();
-        // rimuovo i doppioni in getAllCast()
-        for (Person p : doublesCast) {
-            cast.add(p.getName());
-        }
-        // per ogni nome di una persona creo un nodo
-        for (String s : cast) {
-            graph.addVertex(s);
-        }
-        // aggiungo i vertici per ogni collaboratore
-        for (String s : cast) {
-            for (Movie m : getAllMovies()) {
-                if (search(m.getCast(), s)) {
-                    for (Person p : m.getCast()) {
-                        graph.addEdge(s, p.getName());
-                    }
-                }
-            }
-        }
+        initGraph();
 
     }
 
@@ -546,7 +561,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     public void clear() {
         avl.makeEmpty();
         hash.makeEmpty();
-
+        graph.makeEmpty();
     }
 
     @Override
@@ -570,7 +585,12 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     @Override
     public boolean deleteMovieByTitle(String title) {
         avl.deleteMovieByTitle(title);
-        return hash.delete(title);
+        boolean deleted = hash.delete(title);
+        if (deleted) {
+            graph.makeEmpty();
+            initGraph();
+        }
+        return deleted;
     }
 
     @Override
@@ -648,20 +668,52 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     /* INIZIO IMovidaCollaborations */
     @Override
     public Person[] getDirectCollaboratorsOf(Person actor) {
-        // TODO Auto-generated method stub
 
-        return null;
+        Set<String> directCollaboratorsName = graph.getNeighbors(actor.getName());
+        Set<Person> resultSet = new HashSet<>();
+
+        for (String name : directCollaboratorsName) {
+            resultSet.add(new Person(name));
+        }
+
+        return resultSet.toArray(new Person[resultSet.size()]);
     }
 
     @Override
     public Person[] getTeamOf(Person actor) {
-        // TODO Auto-generated method stub
-        return null;
+        /*
+         * Set<String> resultSetName = graph.getSubgraph(actor.getName());
+         * resultSetName.removeAll(graph.getNeighbors(actor.getName()));
+         * 
+         * Set<Person> resultSet = new HashSet<>(); for (String name : resultSetName) {
+         * resultSet.add(new Person(name)); } return resultSet.toArray(new
+         * Person[resultSet.size()]);
+         */
+        Set<String> subgraph = graph.getSubgraph(actor.getName());
+        List<Person> resultList = new ArrayList<>();
+        for (String name : subgraph) {
+            resultList.add(new Person(name));
+        }
+        return resultList.toArray(new Person[resultList.size()]);
+
+    }
+
+    public List<Movie> searchMovies2(LambdaExpressions.MovieSearchElem condition) {
+        List<Movie> result = new ArrayList<>();
+        for (Movie m : getAllMovies()) {
+            if (condition.searchIn(m)) {
+                result.add(m);
+            }
+        }
+        return result;
     }
 
     @Override
     public Collaboration[] maximizeCollaborationsInTheTeamOf(Person actor) {
-        // TODO Auto-generated method stub
+        Set<String> subgraph = graph.getSubgraph(actor.getName());
+        for (Movie m : getAllMovies()) {
+
+        }
         return null;
     }
     /* FINE IMovidaCollaborations */

@@ -1,17 +1,21 @@
 package movida.commons;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Collaboration {
 
 	Person actorA;
 	Person actorB;
-	ArrayList<Movie> movies;
+	List<Movie> movies;
 
-	public Collaboration(Person actorA, Person actorB) {
+	public Collaboration(Person actorA, Person actorB, List<Movie> movies) {
 		this.actorA = actorA;
 		this.actorB = actorB;
-		this.movies = new ArrayList<Movie>();
+		this.movies = movies;
+	}
+
+	public List<Movie> getMovies() {
+		return movies;
 	}
 
 	public Person getActorA() {
