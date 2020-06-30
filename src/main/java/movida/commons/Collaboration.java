@@ -36,4 +36,9 @@ public class Collaboration {
 		return score / movies.size();
 	}
 
+	@Override
+	public String toString() {
+		return "Collaboration =" + actorA + ", " + actorB + "\t" + getScore() + "\n";
+	}
+
 }

@@ -1,5 +1,6 @@
 package movida.bassolidong.custom_classes;
 
+import movida.commons.Collaboration;
 import movida.commons.Movie;
 
 public class LambdaExpressions {
@@ -8,7 +9,8 @@ public class LambdaExpressions {
         boolean searchIn(Movie m);
     }
 
-    public interface MovieGetIntegerField {
-        Integer getField(Movie m);
+    public interface FieldROfP<R, P> {
+        R getField(P m);
     }
+
 }

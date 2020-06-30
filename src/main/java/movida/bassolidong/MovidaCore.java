@@ -10,11 +10,15 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 import movida.bassolidong.Graph;
 import movida.bassolidong.HashIndirizzamentoAperto.HashTable;
@@ -84,17 +88,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         MovidaCore mc = new MovidaCore(10);
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
-        System.out.println(mc.graph.getNOfConnectedComponents());
-        for (Set<String> subgraph : mc.graph.getDisconnectedSubgraphs()) {
-            System.out.println(subgraph);
-        }
-        for (Person p : mc.getDirectCollaboratorsOf(new Person("Jessica Lange"))) {
-            System.out.println(p.getName());
-        }
-        System.out.println("-------");
-        for (Person p : mc.getTeamOf(new Person("Jessica Lange"))) {
-            System.out.println(p.getName());
-        }
+        mc.maximizeCollaborationsInTheTeamOf(new Person("Bruce Willis"));
 
         /*
          * MovidaCore mc = new MovidaCore(10);
@@ -489,7 +483,10 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
             for (Movie m : getAllMovies()) {
                 if (search(m.getCast(), s)) {
                     for (Person p : m.getCast()) {
-                        graph.addEdge(s, p.getName());
+                        if (!s.equals(p.getName())) {
+
+                            graph.addEdge(s, p.getName());
+                        }
                     }
                 }
             }
@@ -708,13 +705,84 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         return result;
     }
 
+    Set<Collaboration> createSetOfCollaborations(String actor, Set<String> set, Set<Collaboration> colab) {
+        set.add(actor);
+        for (String neighbor : graph.getNeighbors(actor)) {
+            if (!set.contains(neighbor)) {
+                colab.add(new Collaboration(new Person(actor), new Person(neighbor),
+                        searchMovies2(m -> search(m.getCast(), actor) && search(m.getCast(), neighbor))));
+            }
+        }
+
+        for (String neighbor : graph.getNeighbors(actor)) {
+            if (!set.contains(neighbor)) {
+                createSetOfCollaborations(neighbor, set, colab);
+            }
+
+        }
+        return colab;
+    }
+
+    List<Collaboration> visitGraph(String actor, Set<String> set, List<Collaboration> colab) {
+        set.add(actor);
+        for (String neighbor : graph.getNeighbors(actor)) {
+            if (!set.contains(neighbor)) {
+                colab.add(new Collaboration(new Person(actor), new Person(neighbor),
+                        searchMovies2(m -> search(m.getCast(), actor) && search(m.getCast(), neighbor))));
+                visitGraph(neighbor, set, colab);
+            }
+
+        }
+        return colab;
+    }
+
+    public Double[] getColabFieldsAsArray(LambdaExpressions.FieldROfP<Double, Collaboration> condition,
+            List<Collaboration> colab) {
+        List<Double> result = new ArrayList<>();
+        for (Collaboration m : colab) {
+            result.add(condition.getField(m));
+        }
+        Double[] result1 = new Double[result.size()];
+        return result.toArray(result1);
+    }
+
+    public Double sumOfDouble(Double[] array) {
+        Double result = 0.0;
+        for (Double double1 : array) {
+            result += double1;
+        }
+        return result;
+    }
+
     @Override
     public Collaboration[] maximizeCollaborationsInTheTeamOf(Person actor) {
         Set<String> subgraph = graph.getSubgraph(actor.getName());
-        for (Movie m : getAllMovies()) {
-
-        }
+        Set<Collaboration> everyCollaboration = createSetOfCollaborations(actor.getName(), new HashSet<>(),
+                new HashSet<>());
+        System.out.println(everyCollaboration);
         return null;
+        // HashMap<String, Double> everyCollaborationVisit = new HashMap<>();
+        // for (String node : subgraph) {
+        // everyCollaborationVisit.put(node, sumOfDouble(
+        // getColabFieldsAsArray(c -> c.getScore(), visitGraph(node, new HashSet<>(),
+        // new ArrayList<>()))));
+        // }
+        // Double max = 0.0;
+        // String name = "";
+        // for (Entry<String, Double> score : everyCollaborationVisit.entrySet()) {
+        // if (score.getValue() > max) {
+        // max = score.getValue();
+        // name = score.getKey();
+        // }
+        // }
+
+        // System.out.println(visitGraph(name, new HashSet<>(), new ArrayList<>()));
+        // for (Movie m : searchMostVotedMovies(10)) {
+        // System.out.println(m.getTitle() + "\t" + m.getVotes() + "\t" +
+        // Arrays.asList(m.getCast()));
+        // }
+        // System.out.println(everyCollaborationVisit);
+        // return visitGraph(name, new HashSet<>(), new ArrayList<>());
     }
     /* FINE IMovidaCollaborations */
 
@@ -765,7 +833,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
      * @param condition
      * @return
      */
-    public Integer[] getFieldsAsArray(LambdaExpressions.MovieGetIntegerField condition) {
+    public Integer[] getFieldsAsArray(LambdaExpressions.FieldROfP<Integer, Movie> condition) {
         List<Integer> result = new ArrayList<>();
         for (Movie m : getAllMovies()) {
             result.add(condition.getField(m));
@@ -775,7 +843,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     @Override
     public Movie[] searchMostVotedMovies(Integer N) {
-        return firstMovies(N, sortMoviesWithIndexes(sortIndexes(getFieldsAsArray(m -> m.getVotes()))));
+        return firstMovies(N, sortMoviesWithIndexes(sortIndexes(getFieldsAsArray(m -> ((Movie) m).getVotes()))));
     }
 
     @Override

@@ -140,6 +140,7 @@ public class Graph {
      * @return sottografo
      */
     public Set<String> getSubgraph(String u) {
+        disconnectedNodesList.get("s");
         return disconnectedNodesList.get(searchKeyFor(u));
     }
 

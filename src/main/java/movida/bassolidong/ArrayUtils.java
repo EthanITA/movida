@@ -17,6 +17,14 @@ public class ArrayUtils {
         return -1;
     }
 
+    public Integer findIndex(Double n, Double[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (n.equals(array[i]))
+                return i;
+        }
+        return -1;
+    }
+
     /**
      * preso n e un array, trova n in array e lo sostituisce con -1
      * 
@@ -40,6 +48,16 @@ public class ArrayUtils {
         return array;
     }
 
+    public Double[] remove(Double n, Double[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (n.equals(array[i])) {
+                array[i] = -1.0;
+                return array;
+            }
+        }
+        return array;
+    }
+
     /**
      * Dato un array1 e un array2 permutato da array1, restituisce un array di
      * indici associato ad array2
@@ -55,6 +73,16 @@ public class ArrayUtils {
     public Integer[] sortIndex(Integer[] sortedArray, Integer[] toSortArray) {
         Integer[] result = new Integer[sortedArray.length];
         Integer[] tempToSortArray = toSortArray;
+        for (int i = 0; i < sortedArray.length; i++) {
+            result[i] = findIndex(sortedArray[i], tempToSortArray);
+            tempToSortArray = remove(sortedArray[i], tempToSortArray);
+        }
+        return result;
+    }
+
+    public Integer[] sortIndex(Double[] sortedArray, Double[] toSortArray) {
+        Integer[] result = new Integer[sortedArray.length];
+        Double[] tempToSortArray = toSortArray;
         for (int i = 0; i < sortedArray.length; i++) {
             result[i] = findIndex(sortedArray[i], tempToSortArray);
             tempToSortArray = remove(sortedArray[i], tempToSortArray);
