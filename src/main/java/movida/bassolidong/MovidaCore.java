@@ -88,7 +88,8 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         MovidaCore mc = new MovidaCore(10);
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
-        mc.maximizeCollaborationsInTheTeamOf(new Person("Bruce Willis"));
+        System.out.println(mc.createSetOfCollaborations("Al Pacino", new HashSet<>(), new HashSet<>()));
+        mc.maximizeCollaborationsInTheTeamOf(new Person("Al Pacino"));
 
         /*
          * MovidaCore mc = new MovidaCore(10);
@@ -705,6 +706,14 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         return result;
     }
 
+    /**
+     * Crea tutti gli archi possibili di un sottografo (per debugging)
+     * 
+     * @param actor
+     * @param set
+     * @param colab
+     * @return
+     */
     Set<Collaboration> createSetOfCollaborations(String actor, Set<String> set, Set<Collaboration> colab) {
         set.add(actor);
         for (String neighbor : graph.getNeighbors(actor)) {
@@ -723,66 +732,111 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         return colab;
     }
 
-    List<Collaboration> visitGraph(String actor, Set<String> set, List<Collaboration> colab) {
-        set.add(actor);
-        for (String neighbor : graph.getNeighbors(actor)) {
-            if (!set.contains(neighbor)) {
-                colab.add(new Collaboration(new Person(actor), new Person(neighbor),
-                        searchMovies2(m -> search(m.getCast(), actor) && search(m.getCast(), neighbor))));
-                visitGraph(neighbor, set, colab);
+    Collaboration createCollaboration(String nodeA, String nodeB) {
+        return new Collaboration(new Person(nodeA), new Person(nodeB),
+                searchMovies2(m -> search(m.getCast(), nodeA) && search(m.getCast(), nodeB)));
+
+    }
+
+    Double maxSetDouble(Set<Double> myset) {
+        Double max = 0.0;
+        for (Double elem : myset) {
+            if (max < elem) {
+                max = elem;
+            }
+        }
+        return max;
+    }
+
+    /**
+     * Algoritmo di Prim modificato
+     * 
+     * NOTE: Fare la chiamata nel modo seguente: primAlgo(nodo, new HashSet<>(), new
+     * HashMap<>(), new ArrayList<>())
+     * 
+     * @param node           nodo con cui partire
+     * @param markedNodes    nodi marcati da non visitare
+     * @param availableNodes nodi messi in pausa
+     * @param tree           albero finale che verra ritornato
+     * @return
+     */
+    List<Collaboration> primAlgo(String node, Set<String> markedNodes, HashMap<Double, Set<String>> availableNodes,
+            List<Collaboration> tree) {
+        markedNodes.add(node);
+
+        Double maxScore = 0.0;
+        String nextNode = "";
+
+        // determino i prossimi nodi dove posso andare
+        for (String neighbor : graph.getNeighbors(node)) {
+            // controllo se il nodo è già stato percorso
+            if (!markedNodes.contains(neighbor)) {
+                Collaboration edge = createCollaboration(node, neighbor);
+
+                // aggiungo ai nodi disponibili
+                if (availableNodes.get(edge.getScore()) == null) {
+                    availableNodes.put(edge.getScore(), new HashSet<>());
+                }
+                availableNodes.get(edge.getScore()).add(neighbor);
+
+                // percorrero l'arco con il peso maggiore
+                if (edge.getScore() > maxScore) {
+                    maxScore = edge.getScore();
+                    nextNode = neighbor;
+                }
+            }
+        }
+
+        // se tutti i nodi vicini sono già stati visitati ho finito
+        if (nextNode.equals("")) {
+
+            return tree;
+        }
+
+        else {
+            // rimuovo il prossimo nodo dai nodi disponibili, lo aggiungo al mio albero e
+            // continuo a creare il mio albero
+            if (availableNodes.get(maxScore).size() == 1) {
+                availableNodes.remove(maxScore);
+            } else {
+                availableNodes.get(maxScore).remove(nextNode);
+            }
+            tree.add(createCollaboration(node, nextNode));
+            primAlgo(nextNode, markedNodes, availableNodes, tree);
+
+            // finisco di costruire l'albero con sui percorsi rimanenti
+            if (availableNodes.size() > 0) {
+                maxScore = maxSetDouble(availableNodes.keySet());
+                try {
+
+                    for (String nextNodeTest : availableNodes.get(maxScore)) {
+                        if (graph.isAdjacent(node, nextNodeTest)) {
+                            if (availableNodes.get(maxScore).size() == 1) {
+                                availableNodes.remove(maxScore);
+                            } else {
+                                availableNodes.get(maxScore).remove(nextNodeTest);
+                            }
+                            tree.add(createCollaboration(node, nextNodeTest));
+                            primAlgo(nextNodeTest, markedNodes, availableNodes, tree);
+                        }
+                    }
+                } catch (Exception e) {
+                }
             }
 
+            return tree;
         }
-        return colab;
-    }
 
-    public Double[] getColabFieldsAsArray(LambdaExpressions.FieldROfP<Double, Collaboration> condition,
-            List<Collaboration> colab) {
-        List<Double> result = new ArrayList<>();
-        for (Collaboration m : colab) {
-            result.add(condition.getField(m));
-        }
-        Double[] result1 = new Double[result.size()];
-        return result.toArray(result1);
-    }
-
-    public Double sumOfDouble(Double[] array) {
-        Double result = 0.0;
-        for (Double double1 : array) {
-            result += double1;
-        }
-        return result;
     }
 
     @Override
     public Collaboration[] maximizeCollaborationsInTheTeamOf(Person actor) {
         Set<String> subgraph = graph.getSubgraph(actor.getName());
-        Set<Collaboration> everyCollaboration = createSetOfCollaborations(actor.getName(), new HashSet<>(),
-                new HashSet<>());
-        System.out.println(everyCollaboration);
-        return null;
-        // HashMap<String, Double> everyCollaborationVisit = new HashMap<>();
-        // for (String node : subgraph) {
-        // everyCollaborationVisit.put(node, sumOfDouble(
-        // getColabFieldsAsArray(c -> c.getScore(), visitGraph(node, new HashSet<>(),
-        // new ArrayList<>()))));
-        // }
-        // Double max = 0.0;
-        // String name = "";
-        // for (Entry<String, Double> score : everyCollaborationVisit.entrySet()) {
-        // if (score.getValue() > max) {
-        // max = score.getValue();
-        // name = score.getKey();
-        // }
-        // }
+        List<Collaboration> MSTmaxWeight = primAlgo(actor.getName(), new HashSet<>(), new HashMap<>(),
+                new ArrayList<>());
 
-        // System.out.println(visitGraph(name, new HashSet<>(), new ArrayList<>()));
-        // for (Movie m : searchMostVotedMovies(10)) {
-        // System.out.println(m.getTitle() + "\t" + m.getVotes() + "\t" +
-        // Arrays.asList(m.getCast()));
-        // }
-        // System.out.println(everyCollaborationVisit);
-        // return visitGraph(name, new HashSet<>(), new ArrayList<>());
+        return MSTmaxWeight.toArray(new Collaboration[MSTmaxWeight.size()]);
+
     }
     /* FINE IMovidaCollaborations */
 
