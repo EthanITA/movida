@@ -74,7 +74,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
     }
 
     /**
-     * Says hello to the world.
+     * F Says hello to the world.
      * 
      * @param args The arguments of the program.
      */

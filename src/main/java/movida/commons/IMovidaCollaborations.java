@@ -8,9 +8,6 @@
 */
 package movida.commons;
 
-import java.util.List;
-import java.util.Set;
-
 /**
  * 
  * Interfaccia usata per descrivere le operazioni sulle collaborazioni
