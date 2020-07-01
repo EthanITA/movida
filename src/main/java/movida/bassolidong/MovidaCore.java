@@ -62,12 +62,6 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         avl = new AVLTree();
         hash = new HashIndirizzamentoAperto(size);
         graph = new Graph();
-        /*
-         * mc.loadFromFile( new File(
-         * "/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"
-         * )); System.out.println(mc.getAllPeople().length); for (Person p :
-         * mc.getAllPeople()) { System.out.println(p); }
-         */
     }
 
     public boolean search(Person[] p, String s2) {
@@ -88,33 +82,12 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         MovidaCore mc = new MovidaCore(10);
         mc.loadFromFile(
                 new File("/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"));
-        System.out.println(mc.createSetOfCollaborations("Al Pacino", new HashSet<>(), new HashSet<>()));
-        mc.maximizeCollaborationsInTheTeamOf(new Person("Al Pacino"));
 
-        /*
-         * MovidaCore mc = new MovidaCore(10);
-         * 
-         * mc.loadFromFile( new File(
-         * "/home/marco/Documents/uni/alg/MOVIDA/src/main/java/movida/commons/esempio-formato-dati.txt"
-         * )); mc.setMap(MapImplementation.AVL);
-         * mc.setSort(SortingAlgorithm.BubbleSort);
-         * System.out.println(mc.getAllMovies().length);
-         * mc.deleteMovieByTitle("Scface");
-         * System.out.println(mc.getAllMovies().length);
-         * 
-         * for (Movie m : mc.searchMostVotedMovies(110)) {
-         * System.out.println(m.getTitle() + "\t" + m.getVotes() + "\t" + m.getYear());
-         * } System.out.println(" "); for (Person p : mc.searchMostActiveActors(33)) {
-         * System.out.println(p.getName()); } System.out.println(" "); for (Movie m :
-         * mc.searchMostRecentMovies(10)) { System.out.println(m.getTitle() + "\t" +
-         * m.getVotes() + "\t" + m.getYear()); }
-         * 
-         * // mc.loadFromFile(new File( //
-         * "C:\\Users\\loryb\\Desktop\\movida\\src\\main\\java\\movida\\commons\\esempio-formato-dati.txt"
-         * ));
-         * 
-         * // mc.countMovies();
-         */
+        mc.deleteMovieByTitle("What Lies Beneath");
+        for (Collaboration string : mc.maximizeCollaborationsInTheTeamOf(new Person("Michelle Pfeiffer"))) {
+            System.out.println(string);
+        }
+        System.out.println(mc.graph.getDisconnectedSubgraphs());
 
     }
 
@@ -269,7 +242,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         // Utilizzare il metodo sortIndex di ArrayUtils per farlo
         // public Integer[] sortIndex(Integer[] sortedArray, Integer[] unsortedArray)
 
-        Integer[] result = new Integer[array.length];
+        Integer[] result;
 
         if (isBubbleSort()) {
             BubbleSort bs = new BubbleSort();
@@ -494,6 +467,51 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
         }
     }
 
+    public List<Movie> searchMovies2(LambdaExpressions.MovieSearchElem condition) {
+        List<Movie> result = new ArrayList<>();
+        for (Movie m : getAllMovies()) {
+            if (condition.searchIn(m)) {
+                result.add(m);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Crea tutti gli archi possibili di un sottografo (per debugging)
+     * 
+     * @param actor
+     * @param set
+     * @param colab
+     * @return
+     */
+    Set<Collaboration> createSetOfCollaborations(String actor, Set<String> set, Set<Collaboration> colab) {
+        set.add(actor);
+        for (String neighbor : graph.getNeighbors(actor)) {
+            if (!set.contains(neighbor)) {
+                colab.add(new Collaboration(new Person(actor), new Person(neighbor),
+                        searchMovies2(m -> search(m.getCast(), actor) && search(m.getCast(), neighbor))));
+            }
+        }
+
+        for (String neighbor : graph.getNeighbors(actor)) {
+            if (!set.contains(neighbor)) {
+                createSetOfCollaborations(neighbor, set, colab);
+            }
+
+        }
+        return colab;
+    }
+
+    Double maxSetDouble(Set<Double> myset) {
+        Double max = 0.0;
+        for (Double elem : myset) {
+            if (max < elem) {
+                max = elem;
+            }
+        }
+        return max;
+    }
     /////////////////////////////////////////////////////
 
     /* INIZIO IMovidaDB */
@@ -696,56 +714,17 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     }
 
-    public List<Movie> searchMovies2(LambdaExpressions.MovieSearchElem condition) {
-        List<Movie> result = new ArrayList<>();
-        for (Movie m : getAllMovies()) {
-            if (condition.searchIn(m)) {
-                result.add(m);
-            }
-        }
-        return result;
-    }
-
     /**
-     * Crea tutti gli archi possibili di un sottografo (per debugging)
+     * crea una collaborazione tra attoreA e attoreB
      * 
-     * @param actor
-     * @param set
-     * @param colab
+     * @param attoreA
+     * @param attoreB
      * @return
      */
-    Set<Collaboration> createSetOfCollaborations(String actor, Set<String> set, Set<Collaboration> colab) {
-        set.add(actor);
-        for (String neighbor : graph.getNeighbors(actor)) {
-            if (!set.contains(neighbor)) {
-                colab.add(new Collaboration(new Person(actor), new Person(neighbor),
-                        searchMovies2(m -> search(m.getCast(), actor) && search(m.getCast(), neighbor))));
-            }
-        }
+    Collaboration createCollaboration(String attoreA, String attoreB) {
+        return new Collaboration(new Person(attoreA), new Person(attoreB),
+                searchMovies2(m -> search(m.getCast(), attoreA) && search(m.getCast(), attoreB)));
 
-        for (String neighbor : graph.getNeighbors(actor)) {
-            if (!set.contains(neighbor)) {
-                createSetOfCollaborations(neighbor, set, colab);
-            }
-
-        }
-        return colab;
-    }
-
-    Collaboration createCollaboration(String nodeA, String nodeB) {
-        return new Collaboration(new Person(nodeA), new Person(nodeB),
-                searchMovies2(m -> search(m.getCast(), nodeA) && search(m.getCast(), nodeB)));
-
-    }
-
-    Double maxSetDouble(Set<Double> myset) {
-        Double max = 0.0;
-        for (Double elem : myset) {
-            if (max < elem) {
-                max = elem;
-            }
-        }
-        return max;
     }
 
     /**
@@ -831,7 +810,7 @@ public final class MovidaCore implements IMovidaDB, IMovidaConfig, IMovidaSearch
 
     @Override
     public Collaboration[] maximizeCollaborationsInTheTeamOf(Person actor) {
-        Set<String> subgraph = graph.getSubgraph(actor.getName());
+
         List<Collaboration> MSTmaxWeight = primAlgo(actor.getName(), new HashSet<>(), new HashMap<>(),
                 new ArrayList<>());
 

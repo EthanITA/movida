@@ -148,6 +148,7 @@ public class Graph {
     public void makeEmpty() {
         this.adjacencyList = new HashMap<>();
         this.disconnectedNodesList = new HashMap<>();
+        this.disconnectedNodesList.put(0, new HashSet<>());
     }
 
     // Funzioni ausiliarie
